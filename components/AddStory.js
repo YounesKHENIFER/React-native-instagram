@@ -7,7 +7,7 @@ const AddStory = ({name, picture}) => {
   return (
     <TouchableOpacity style={styles.container}>
       <View style={styles.circle}>
-        <Image style={styles.image} source={picture} />
+        <Image style={styles.image} source={{uri: picture}} />
       </View>
       <View>
         <Text style={styles.name} circle>

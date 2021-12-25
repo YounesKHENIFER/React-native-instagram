@@ -10,10 +10,10 @@ import useAuth from '../context/useAuth';
 
 const Stack = createNativeStackNavigator();
 const StackNav = () => {
-  const {user, loggedInUser} = useAuth();
+  const {user} = useAuth();
   return (
     <Stack.Navigator screenOptions={{headerShown: false}}>
-      {loggedInUser ? (
+      {user ? (
         <>
           <Stack.Screen name="MainApp" component={TopTabs} />
           <Stack.Screen name="Story" component={Story} />

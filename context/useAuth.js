@@ -14,21 +14,23 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({children}) => {
   const [user, setUser] = useState(null);
-  const [loggedInUser, setLoggedInUser] = useState(null);
   const [initLoading, setInitLoading] = useState(true);
 
   useEffect(() => {
     const unsubscribe = auth().onAuthStateChanged(async currentUser => {
-      setLoggedInUser(currentUser);
       if (currentUser) {
         firestore()
           .collection('Users')
           .doc(currentUser.uid)
           .get()
-          .then(res => setUser(res.data()))
-          .catch(e => console.log(e.message));
+          .then(res => {
+            setUser(res.data());
+          })
+          .catch(e => console.log(e.message))
+          .finally(() => setInitLoading(false));
+      } else {
+        setInitLoading(false);
       }
-      setInitLoading(false);
     });
     return unsubscribe;
   }, []);
@@ -36,10 +38,9 @@ export const AuthProvider = ({children}) => {
   const memoValue = useMemo(
     () => ({
       user,
-      loggedInUser,
       setUser,
     }),
-    [user, loggedInUser],
+    [user],
   );
   return (
     <>

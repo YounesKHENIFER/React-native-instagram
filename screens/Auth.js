@@ -1,10 +1,12 @@
 import React, {useState} from 'react';
 import {StyleSheet, Text, View, TouchableOpacity, Image} from 'react-native';
+
 import Input from '../components/Input';
 import Btn from '../components/Btn';
 
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
+
 import ErrorMsg from '../components/ErrorMsg';
 
 export default function Auth() {
@@ -20,7 +22,7 @@ export default function Auth() {
     setError(err);
     return setTimeout(() => {
       setError('');
-    }, 2000);
+    }, 3000);
   }
 
   // login function
@@ -32,7 +34,16 @@ export default function Auth() {
         .signInWithEmailAndPassword(email, password)
         .then(userCredential => {})
         .catch(error => {
-          Errmsg(error.message);
+          if (
+            error.code === 'auth/wrong-password' ||
+            error.code === 'auth/user-not-found'
+          ) {
+            Errmsg('Wrong Email Or Password');
+          } else if (error.code === 'auth/too-many-requests') {
+            Errmsg('Too Many Requests Try Again Later');
+          } else {
+            Errmsg('There Is A Probleme Try Again');
+          }
         });
     } else {
       Errmsg('Please Enter Your Credentials');
@@ -50,6 +61,7 @@ export default function Auth() {
             .collection('Users')
             .doc(userCredential.user.uid)
             .set({
+              uid: userCredential.user.uid,
               username: username,
               email: userCredential.user.email,
               profilePicture:
@@ -57,11 +69,17 @@ export default function Auth() {
             })
             .then(() => console.log('user added'))
             .catch(error => {
-              console.log(error.message);
+              Errmsg('There Is A Probleme Try Again');
             });
         })
         .catch(error => {
-          Errmsg(error.message);
+          if (error.code === 'auth/email-already-in-use') {
+            Errmsg('Use An Unique Personal Email');
+          } else if (error.code === 'auth/weak-password') {
+            Errmsg('Your Password Is Weak Use More Then 6 Character');
+          } else {
+            Errmsg('There Is A Probleme Try Again');
+          }
         });
     } else {
       Errmsg('Please Enter Your Credentials');

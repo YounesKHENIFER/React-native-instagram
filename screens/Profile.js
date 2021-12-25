@@ -29,24 +29,14 @@ import {posts} from '../dummyData';
 const Stack = createNativeStackNavigator();
 const Tab = createMaterialTopTabNavigator();
 
-export default function Profile() {
-  return (
-    <Stack.Navigator
-      screenOptions={{
-        headerShown: false,
-      }}>
-      <Stack.Screen name="userProfile" component={userProfile} />
-      <Stack.Screen name="Edit" component={EditUser} />
-    </Stack.Navigator>
-  );
-}
-
-function userProfile({navigation}) {
+export default function Profile({navigation}) {
   const {user} = useAuth();
+  const [modal, setModal] = useState(false);
   return (
     <View style={styles.container}>
       <Header navigation={navigation} user={user} />
-      <Informations navigation={navigation} user={user} />
+      <Informations navigation={navigation} user={user} setModal={setModal} />
+
       <Tab.Navigator
         initialRouteName="Posts"
         screenOptions={({route}) => ({
@@ -77,6 +67,7 @@ function userProfile({navigation}) {
         <Tab.Screen name="Videos" component={Videos} />
         <Tab.Screen name="Tags" component={Tags} />
       </Tab.Navigator>
+      <EditUser setModal={setModal} modal={modal} />
     </View>
   );
 }
@@ -106,7 +97,7 @@ function Header({navigation, user}) {
   );
 }
 
-function Informations({navigation, user}) {
+function Informations({navigation, user, setModal}) {
   return (
     <View>
       <View
@@ -143,7 +134,7 @@ function Informations({navigation, user}) {
           color: 'black',
           fontWeight: '600',
         }}
-        onPress={() => navigation.navigate('Edit')}
+        onPress={() => setModal(true)}
       />
       <ScrollView
         showsHorizontalScrollIndicator={false}

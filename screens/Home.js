@@ -17,7 +17,7 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 import {posts, stories} from '../dummyData';
-
+import useAuth from '../context/useAuth';
 const Home = ({navigation}) => {
   const [refreshing, setRefreshing] = useState(false);
 
@@ -62,37 +62,8 @@ function Header({navigation}) {
 }
 
 function Stories({navigation}) {
-  const storys = [
-    {
-      name: 'younes.khenifer',
-      picture: require('../assets/1.jpg'),
-    },
-    {
-      name: 'catts_Lover',
-      picture: require('../assets/1.jpg'),
-    },
-    {
-      name: 'miiddou_123',
-      picture: require('../assets/1.jpg'),
-    },
+  const {user} = useAuth();
 
-    {
-      name: 'ihab_brs',
-      picture: require('../assets/1.jpg'),
-    },
-    {
-      name: 'skandar_ar',
-      picture: require('../assets/1.jpg'),
-    },
-    {
-      name: 'zaki.matmat',
-      picture: require('../assets/1.jpg'),
-    },
-    {
-      name: 'mohammed_zerdoumi',
-      picture: require('../assets/1.jpg'),
-    },
-  ];
   return (
     <View>
       <FlatList
@@ -111,7 +82,7 @@ function Stories({navigation}) {
           />
         )}
         ListHeaderComponent={
-          <AddStory name="Your Story" picture={require('../assets/1.jpg')} />
+          <AddStory name="Your Story" picture={user.profilePicture} />
         }
       />
       <View
