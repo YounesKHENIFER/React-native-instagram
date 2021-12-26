@@ -1,5 +1,12 @@
 import React, {useState} from 'react';
-import {StyleSheet, Text, View, TouchableOpacity, Image} from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  Image,
+  ActivityIndicator,
+} from 'react-native';
 
 import Input from '../components/Input';
 import Btn from '../components/Btn';
@@ -110,31 +117,41 @@ export default function Auth() {
           secure={true}
         />
         {/* displaying different btns   */}
-        {screen === 'login' ? (
+        {!loginLoading ? (
           <>
-            <Btn
-              onPress={() => handleLogin()}
-              title="LOGIN"
-              disabled={loginLoading}
-            />
-            <TouchableOpacity
-              style={styles.link}
-              onPress={() => setScreen('register')}>
-              <Text>Don't Have An Account ? </Text>
-              <Text style={{color: '#217ac1'}}>Register Now</Text>
-            </TouchableOpacity>
+            {screen === 'login' ? (
+              <>
+                <Btn
+                  onPress={() => handleLogin()}
+                  title="LOGIN"
+                  disabled={loginLoading}
+                />
+                <TouchableOpacity
+                  style={styles.link}
+                  onPress={() => setScreen('register')}>
+                  <Text>Don't Have An Account ? </Text>
+                  <Text style={{color: '#217ac1'}}>Register Now</Text>
+                </TouchableOpacity>
+              </>
+            ) : (
+              <>
+                <Btn onPress={() => handleCreate()} title="REGISTER" />
+                <TouchableOpacity
+                  style={styles.link}
+                  onPress={() => setScreen('login')}>
+                  <Text>Already Have An Account ? </Text>
+                  <Text style={{color: '#217ac1'}}>Login Now</Text>
+                </TouchableOpacity>
+              </>
+            )}
           </>
         ) : (
-          <>
-            <Btn onPress={() => handleCreate()} title="REGISTER" />
-            <TouchableOpacity
-              style={styles.link}
-              onPress={() => setScreen('login')}>
-              <Text>Already Have An Account ? </Text>
-              <Text style={{color: '#217ac1'}}>Login Now</Text>
-            </TouchableOpacity>
-          </>
+          <View style={styles.saving}>
+            <ActivityIndicator color="#ccc" size="large" />
+            <Text>Login...</Text>
+          </View>
         )}
+
         {/* display error msg to user */}
         {error ? <ErrorMsg error={error} /> : null}
       </View>
@@ -161,5 +178,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     flexDirection: 'row',
     marginBottom: 50,
+  },
+  saving: {
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

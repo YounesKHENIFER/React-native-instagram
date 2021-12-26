@@ -2,8 +2,10 @@ import React from 'react';
 
 import {StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
+import {useTheme} from '@react-navigation/native';
 
 const Story = props => {
+  const {colors} = useTheme();
   const {username, profilePicture, navigation} = props;
   return (
     <TouchableOpacity
@@ -19,11 +21,17 @@ const Story = props => {
         start={{x: 0.0, y: 1.0}}
         end={{x: 1.0, y: 1.0}}
         style={styles.circle}>
-        <Image source={{uri: profilePicture}} style={styles.image} />
+        <Image
+          source={{uri: profilePicture}}
+          style={[styles.image, {borderColor: colors.background}]}
+        />
       </LinearGradient>
 
       <View style={{width: 70}}>
-        <Text style={styles.name} circle numberOfLines={1}>
+        <Text
+          style={[styles.name, {color: colors.text}]}
+          circle
+          numberOfLines={1}>
           {username}
         </Text>
       </View>
@@ -47,7 +55,6 @@ const styles = StyleSheet.create({
     width: 64,
     borderRadius: 32,
     alignSelf: 'center',
-    borderColor: '#fff',
     borderWidth: 2,
   },
   name: {

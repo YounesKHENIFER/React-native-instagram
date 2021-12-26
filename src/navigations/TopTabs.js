@@ -1,9 +1,9 @@
 import React from 'react';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 
-import Messages from './Messages';
+import Messages from '../screens/Messages';
 import BottomTabs from './BottomTabs';
-import Camera from './Camera';
+import Camera from '../screens/Camera';
 
 const Tab = createMaterialTopTabNavigator();
 

@@ -1,18 +1,19 @@
 import React from 'react';
-import {NavigationContainer} from '@react-navigation/native';
 
-import StackNav from './src/screens/StackNav';
 import {AuthProvider} from './src/context/useAuth';
+import {ThemeProvider} from './src/context/useToggleTheme';
 import {LogBox} from 'react-native';
+
+import Index from './src/navigations';
 
 const App = () => {
   LogBox.ignoreLogs(['AsyncStorage']);
   return (
-    <AuthProvider>
-      <NavigationContainer>
-        <StackNav />
-      </NavigationContainer>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <Index />
+      </AuthProvider>
+    </ThemeProvider>
   );
 };
 

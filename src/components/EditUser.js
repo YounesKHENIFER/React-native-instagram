@@ -76,7 +76,7 @@ export default function Edit({setEditModal, editModal}) {
           .doc(user.uid)
           .update(newUserInfos);
 
-        setModal(false);
+        setEditModal(false);
       } catch (error) {
         console.log('inside update', error.message);
       }

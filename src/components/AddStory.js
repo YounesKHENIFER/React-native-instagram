@@ -2,12 +2,17 @@ import React from 'react';
 import {StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
 
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import {useTheme} from '@react-navigation/native';
 
 const AddStory = ({name, picture}) => {
+  const {colors} = useTheme();
   return (
     <TouchableOpacity style={styles.container}>
       <View style={styles.circle}>
-        <Image style={styles.image} source={{uri: picture}} />
+        <Image
+          style={[styles.image, {borderColor: colors.background}]}
+          source={{uri: picture}}
+        />
       </View>
       <View>
         <Text style={styles.name} circle>
@@ -39,7 +44,6 @@ const styles = StyleSheet.create({
     borderRadius: 32,
     justifyContent: 'center',
     alignItems: 'center',
-    borderColor: 'white',
     borderWidth: 1.5,
   },
   name: {

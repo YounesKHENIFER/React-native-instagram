@@ -7,6 +7,7 @@ import {
   Image,
   ScrollView,
   Modal,
+  Switch,
 } from 'react-native';
 
 import auth from '@react-native-firebase/auth';
@@ -24,17 +25,21 @@ import ThreePostsBox from '../components/ThreePostsBox';
 import IconBtn from '../components/IconBtn';
 
 import {posts} from '../../dummyData';
+import {useTheme} from '@react-navigation/native';
+import useToggleTheme from '../context/useToggleTheme';
 
 const Tab = createMaterialTopTabNavigator();
 
 export default function Profile({navigation}) {
   const {user} = useAuth();
+  const {colors} = useTheme();
+
   const [editModal, setEditModal] = useState(false);
-  const [menuModal, setMenuModal] = useState(false);
   return (
-    <View style={styles.container}>
-      <Header navigation={navigation} user={user} />
+    <View style={[styles.container, {backgroundColor: colors.background}]}>
+      <Header colors={colors} navigation={navigation} user={user} />
       <Informations
+        colors={colors}
         navigation={navigation}
         user={user}
         setEditModal={setEditModal}
@@ -45,24 +50,26 @@ export default function Profile({navigation}) {
         screenOptions={({route}) => ({
           tabBarShowLabel: false,
           tabBarShowIcon: true,
-          tabBarActiveTintColor: 'black',
+          tabBarActiveTintColor: colors.text,
+          tabBarInactiveTintColor: colors.text,
           tabBarStyle: {
+            backgroundColor: colors.background,
             elevation: 0,
-            borderBottomColor: '#ddd',
+            borderBottomColor: colors.text,
             borderBottomWidth: 1,
           },
           tabBarIndicatorStyle: {
-            backgroundColor: 'black',
+            backgroundColor: colors.text,
             height: 1.5,
           },
           swipeEnabled: true,
-          tabBarIcon: () => {
+          tabBarIcon: ({color}) => {
             if (route.name === 'Posts') {
-              return <Feather name="grid" size={23} />;
+              return <Feather name="grid" size={23} color={color} />;
             } else if (route.name === 'Videos') {
-              return <Feather name="play-circle" size={25} />;
+              return <Feather name="play-circle" size={25} color={color} />;
             } else if (route.name === 'Tags') {
-              return <Feather name="tag" size={25} />;
+              return <Feather name="tag" size={25} color={color} />;
             }
           },
         })}>
@@ -74,42 +81,56 @@ export default function Profile({navigation}) {
         setEditModal={setEditModal}
         editModal={editModal}
         navigation={navigation}
+        colors={colors}
       />
     </View>
   );
 }
 
-function Header({navigation, user}) {
+function Header({colors, navigation, user}) {
+  const {isDark, setIsDark} = useToggleTheme();
   const [modalVisible, setModelVisible] = useState(false);
   return (
     <View style={styles.header}>
       <View style={styles.row}>
-        <Feather name="lock" size={20} color="black" />
-        <Text style={styles.text}>{user?.username}</Text>
+        <Feather name="lock" size={20} color={colors.text} />
+        <Text style={[styles.text, {color: colors.text}]}>
+          {user?.username}
+        </Text>
       </View>
       <View style={styles.row}>
+        <Switch
+          trackColor={{false: '#7675', true: '#ccc'}}
+          thumbColor={isDark ? '#f4f3f4' : '#767577'}
+          onValueChange={() => setIsDark(!isDark)}
+          value={isDark}
+        />
         <TouchableOpacity
-          style={styles.text}
+          style={[styles.text, {color: colors.text}]}
           onPress={() => navigation.navigate('AddPost')}>
           <Feather
             name="plus-square"
             size={25}
-            color="black"
+            color={colors.text}
             onPress={() => navigation.navigate('AddPost')}
           />
         </TouchableOpacity>
         <TouchableOpacity
-          style={styles.text}
+          style={[styles.text, {color: colors.text}]}
           onPress={() => setModelVisible(true)}>
-          <Feather name="menu" size={25} color="black" />
+          <Feather name="menu" size={25} color={colors.text} />
         </TouchableOpacity>
       </View>
-      <MyModal modalVisible={modalVisible} setModelVisible={setModelVisible} />
+      <MyModal
+        colors={colors}
+        modalVisible={modalVisible}
+        setModelVisible={setModelVisible}
+      />
     </View>
   );
 }
 
-function Informations({navigation, user, setEditModal}) {
+function Informations({navigation, user, setEditModal, colors}) {
   return (
     <View>
       <View
@@ -120,35 +141,33 @@ function Informations({navigation, user, setEditModal}) {
         <Image style={styles.profile} source={{uri: user?.profilePicture}} />
         <View style={styles.row}>
           <TouchableOpacity style={styles.column}>
-            <Text style={styles.number}>6</Text>
-            <Text>Posts</Text>
+            <Text style={[styles.number, {color: colors.text}]}>6</Text>
+            <Text style={{color: colors.text}}>Posts</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.column}>
-            <Text style={styles.number}>61</Text>
-            <Text>Followers</Text>
+            <Text style={[styles.number, {color: colors.text}]}>61</Text>
+            <Text style={{color: colors.text}}>Followers</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.column}>
-            <Text style={styles.number}>168</Text>
-            <Text>Following</Text>
+            <Text style={[styles.number, {color: colors.text}]}>168</Text>
+            <Text style={{color: colors.text}}>Following</Text>
           </TouchableOpacity>
         </View>
       </View>
       <View style={{marginHorizontal: 20, marginVertical: 10}}>
-        <Text style={{color: 'black'}}>{user?.displayName}</Text>
-        <Text>
-          Bio : <Text style={{color: 'black'}}>{user?.bio}</Text>
-        </Text>
+        <Text style={{color: colors.text}}>{user?.displayName}</Text>
+        <Text style={{color: colors.text}}>Bio : {user?.bio}</Text>
       </View>
       <Btn
         title="Edit Profile"
         btnStyle={{
           padding: 5,
-          backgroundColor: '#fff',
-          borderColor: '#cccs',
+          backgroundColor: colors.background,
+          borderColor: colors.text,
           borderWidth: 1,
         }}
         txtStyle={{
-          color: 'black',
+          color: colors.text,
           fontWeight: '600',
         }}
         onPress={() => setEditModal(true)}
@@ -158,7 +177,7 @@ function Informations({navigation, user, setEditModal}) {
         horizontal
         style={styles.highlightes}>
         <View style={styles.circle}>
-          <Feather name="plus" size={30} color="black" />
+          <Feather name="plus" size={30} color={colors.background} />
         </View>
         <View style={styles.circle} />
         <View style={styles.circle} />
@@ -198,7 +217,7 @@ function Tags() {
   );
 }
 
-function MyModal({modalVisible, setModelVisible}) {
+function MyModal({colors, modalVisible, setModelVisible}) {
   return (
     <Modal
       animationType="slide"
@@ -208,21 +227,24 @@ function MyModal({modalVisible, setModelVisible}) {
         setModelVisible(false);
       }}>
       <View style={styles.modalContainer}>
-        <View style={styles.modalContent}>
+        <View
+          style={[styles.modalContent, {backgroundColor: colors.background}]}>
           <TouchableOpacity
             onPress={() => {
               setModelVisible(false);
             }}
             style={{height: 10}}>
-            <View style={styles.modalClose} />
+            <View style={[styles.modalClose, {backgroundColor: colors.text}]} />
           </TouchableOpacity>
           <IconBtn
             title="Settings"
-            icon={<Feather name="settings" size={23} color="black" />}
+            icon={<Feather name="settings" size={23} color={colors.text} />}
           />
           <IconBtn
             title="Archive"
-            icon={<MaterialIcons name="restore" size={23} color="black" />}
+            icon={
+              <MaterialIcons name="restore" size={23} color={colors.text} />
+            }
           />
           <IconBtn
             title="Your Activity"
@@ -230,19 +252,23 @@ function MyModal({modalVisible, setModelVisible}) {
               <MaterialCommunityIcons
                 name="progress-clock"
                 size={23}
-                color="black"
+                color={colors.text}
               />
             }
           />
           <IconBtn
             title="QR Code"
             icon={
-              <MaterialIcons name="qr-code-scanner" size={23} color="black" />
+              <MaterialIcons
+                name="qr-code-scanner"
+                size={23}
+                color={colors.text}
+              />
             }
           />
           <IconBtn
             title="Saved"
-            icon={<Feather name="bookmark" size={23} color="black" />}
+            icon={<Feather name="bookmark" size={23} color={colors.text} />}
           />
           <IconBtn
             title="Close Friends"
@@ -250,7 +276,7 @@ function MyModal({modalVisible, setModelVisible}) {
               <MaterialCommunityIcons
                 name="playlist-star"
                 size={23}
-                color="black"
+                color={colors.text}
               />
             }
           />
@@ -260,13 +286,13 @@ function MyModal({modalVisible, setModelVisible}) {
               <MaterialCommunityIcons
                 name="heart-pulse"
                 size={23}
-                color="black"
+                color={colors.text}
               />
             }
           />
           <IconBtn
             title="Log Out"
-            icon={<Feather name="log-out" size={23} color="black" />}
+            icon={<Feather name="log-out" size={23} color={colors.text} />}
             onPress={() => auth().signOut()}
           />
         </View>
@@ -277,7 +303,6 @@ function MyModal({modalVisible, setModelVisible}) {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'white',
     flex: 1,
     position: 'relative',
   },
@@ -299,7 +324,6 @@ const styles = StyleSheet.create({
   text: {
     marginLeft: 10,
     fontSize: 17,
-    color: 'black',
   },
   profile: {
     height: 95,
@@ -309,7 +333,6 @@ const styles = StyleSheet.create({
   number: {
     fontWeight: '600',
     fontSize: 18,
-    color: 'black',
   },
   highlightes: {
     marginVertical: 20,
@@ -332,7 +355,6 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   modalContent: {
-    backgroundColor: 'white',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     paddingVertical: 15,
@@ -342,7 +364,6 @@ const styles = StyleSheet.create({
     width: 40,
     height: 4,
     borderRadius: 5,
-    backgroundColor: 'gray',
     alignSelf: 'center',
   },
 });

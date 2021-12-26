@@ -6,6 +6,8 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Feather from 'react-native-vector-icons/Feather';
 
+import {useTheme} from '@react-navigation/native';
+
 export default function Post({
   username,
   profilePicture,
@@ -13,12 +15,18 @@ export default function Post({
   likes,
   description,
 }) {
+  const {colors} = useTheme();
   return (
     <View style={s.container}>
-      <Header username={username} profilePicture={profilePicture} />
-      <PostImage image={postImage} />
-      <Footer />
+      <Header
+        colors={colors}
+        username={username}
+        profilePicture={profilePicture}
+      />
+      <PostImage colors={colors} image={postImage} />
+      <Footer colors={colors} />
       <Description
+        colors={colors}
         username={username}
         likes={likes}
         description={description}
@@ -27,7 +35,7 @@ export default function Post({
   );
 }
 
-function Header({username, profilePicture}) {
+function Header({username, profilePicture, colors}) {
   return (
     <View style={s.header}>
       <View style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -40,27 +48,35 @@ function Header({username, profilePicture}) {
           />
         </View>
         <View>
-          <Text style={s.name} circle numberOfLines={1}>
+          <Text
+            style={[
+              s.name,
+              {
+                color: colors.text,
+              },
+            ]}
+            circle
+            numberOfLines={1}>
             {username}
           </Text>
         </View>
       </View>
       <TouchableOpacity>
-        <Feather name="more-vertical" size={25} color="black" />
+        <Feather name="more-vertical" size={25} color={colors.text} />
       </TouchableOpacity>
     </View>
   );
 }
 
-function PostImage({image}) {
+function PostImage({image, colors}) {
   return (
-    <View style={s.imageBox}>
+    <View style={[s.imageBox, {backgroundColor: colors.postBack}]}>
       <Image source={{uri: image}} resizeMode="contain" style={s.image} />
     </View>
   );
 }
 
-function Footer() {
+function Footer({colors}) {
   const [bookmarked, setBookmarked] = useState(false);
   const [liked, setLiked] = useState(false);
   return (
@@ -80,16 +96,16 @@ function Footer() {
             <AntDesign
               name={liked ? 'heart' : 'hearto'}
               size={25}
-              color={liked ? 'red' : 'black'}
+              color={liked ? 'red' : colors.text}
             />
           </TouchableOpacity>
 
           <TouchableOpacity style={s.btn} onPress={() => {}}>
-            <AntDesign name="message1" size={25} color="black" />
+            <AntDesign name="message1" size={25} color={colors.text} />
           </TouchableOpacity>
 
           <TouchableOpacity style={s.btn} onPress={() => {}}>
-            <Feather name="send" size={25} color="black" />
+            <Feather name="send" size={25} color={colors.text} />
           </TouchableOpacity>
         </View>
         <TouchableOpacity
@@ -98,7 +114,7 @@ function Footer() {
           <Ionicons
             name={bookmarked ? 'bookmark' : 'bookmark-outline'}
             size={25}
-            color="black"
+            color={colors.text}
           />
         </TouchableOpacity>
       </View>
@@ -106,7 +122,7 @@ function Footer() {
   );
 }
 
-function Description({likes, description, username}) {
+function Description({likes, description, username, colors}) {
   const [nlines, setNlines] = useState(true);
   return (
     <View style={{paddingHorizontal: 10}}>
@@ -114,14 +130,22 @@ function Description({likes, description, username}) {
         style={{
           fontWeight: 'bold',
           fontSize: 15,
-          color: 'black',
+          color: colors.text,
         }}>
         {likes} Likes
       </Text>
-      <Text style={s.name}>{username}</Text>
+      <Text
+        style={[
+          s.name,
+          {
+            color: colors.text,
+          },
+        ]}>
+        {username}
+      </Text>
       <Text
         style={{
-          color: 'black',
+          color: colors.text,
         }}
         numberOfLines={nlines ? 3 : null}>
         {description}
@@ -134,7 +158,7 @@ function Description({likes, description, username}) {
             style={{
               fontWeight: '500',
               fontSize: 14,
-              color: 'black',
+              color: colors.text,
             }}>
             See {nlines ? 'More' : 'Less'}
           </Text>
@@ -156,7 +180,6 @@ const s = StyleSheet.create({
     justifyContent: 'space-between',
   },
   circle: {
-    backgroundColor: '#c90873',
     height: 68,
     width: 68,
     borderRadius: 34,
@@ -174,11 +197,9 @@ const s = StyleSheet.create({
   name: {
     fontSize: 15,
     fontWeight: '500',
-    color: 'black',
   },
   imageBox: {
     height: 350,
-    backgroundColor: '#eee',
     alignItems: 'center',
   },
   image: {

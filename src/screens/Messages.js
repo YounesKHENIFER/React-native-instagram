@@ -16,6 +16,8 @@ import SearchBox from '../components/SearchBox';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Feather from 'react-native-vector-icons/Feather';
 import {messages} from '../../dummyData';
+import {useTheme} from '@react-navigation/native';
+import {colors} from 'react-native-elements';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -25,25 +27,27 @@ export default function Messages({navigation}) {
     navigation.setOptions({swipeEnabled: true});
   }, [navigation]);
 
+  const {colors} = useTheme();
   return (
-    <React.Fragment>
-      <Header navigation={navigation} />
+    <>
+      <Header navigation={navigation} colors={colors} />
       <Tab.Navigator
         initialRouteName="Chats"
         screenOptions={{
           swipeEnabled: false,
-          tabBarActiveTintColor: 'black',
+          tabBarActiveTintColor: colors.text,
           tabBarStyle: {
             elevation: 0,
-            borderBottomColor: '#ddd',
+            borderBottomColor: colors.background,
             borderBottomWidth: 1,
+            backgroundColor: colors.background,
           },
           tabBarLabelStyle: {
             fontSize: 13,
             fontWeight: '500',
           },
           tabBarIndicatorStyle: {
-            backgroundColor: 'black',
+            backgroundColor: colors.text,
             height: 1.5,
           },
         }}>
@@ -51,11 +55,11 @@ export default function Messages({navigation}) {
         <Tab.Screen name="Calls" component={Calls} />
         <Tab.Screen name="Requests" component={Requests} />
       </Tab.Navigator>
-    </React.Fragment>
+    </>
   );
 }
 
-function Header({navigation}) {
+function Header({navigation, colors}) {
   return (
     <View style={styles.header}>
       {/* right section */}
@@ -66,9 +70,9 @@ function Header({navigation}) {
           style={{marginHorizontal: 15}}
           name="arrowleft"
           size={30}
-          color="black"
+          color={colors.text}
         />
-        <Text style={{fontSize: 20, color: 'black'}}>Back</Text>
+        <Text style={{fontSize: 20, color: colors.text}}>Back</Text>
       </TouchableOpacity>
       {/* left section */}
       <View style={styles.row}>
@@ -77,17 +81,18 @@ function Header({navigation}) {
             style={{marginRight: 15}}
             name="video"
             size={27}
-            color="black"
+            color={colors.text}
           />
         </TouchableOpacity>
         <TouchableOpacity>
-          <Feather name="edit" size={27} color="black" />
+          <Feather name="edit" size={27} color={colors.text} />
         </TouchableOpacity>
       </View>
     </View>
   );
 }
 function Chats() {
+  const {colors} = useTheme();
   // search functionality
   function handleSearch(text) {
     console.log(text);
@@ -105,7 +110,10 @@ function Chats() {
     <FlatList
       refreshing={refreshing}
       onRefresh={() => onRefresh()}
-      contentContainerStyle={styles.container}
+      contentContainerStyle={[
+        styles.container,
+        {backgroundColor: colors.background},
+      ]}
       data={messages}
       keyExtractor={(item, i) => i}
       renderItem={({item}) => (
@@ -113,6 +121,7 @@ function Chats() {
           username={item.username}
           lastMessage={item.lastMessage}
           profilePicture={item.profilePicture}
+          colors={colors}
         />
       )}
       ListHeaderComponent={<SearchBox onChangeText={handleSearch} />}
@@ -133,27 +142,28 @@ function Requests() {
     </ScrollView>
   );
 }
-function Message({username, lastMessage, profilePicture}) {
+function Message({colors, username, lastMessage, profilePicture}) {
   return (
     <View style={styles.messageBox}>
       {/* left section */}
       <TouchableOpacity style={{...styles.row, flex: 1}} activeOpacity={0.6}>
         <View style={styles.circle}>
           <Image
-            style={styles.image}
+            style={[styles.image, {borderColor: colors.text}]}
             source={{uri: profilePicture}}
-            style={styles.image}
           />
         </View>
         <View style={{maxWidth: 250}}>
-          <Text style={styles.name}>{username}</Text>
-          <Text numberOfLines={1}>{lastMessage}</Text>
+          <Text style={[styles.name, {color: colors.text}]}>{username}</Text>
+          <Text numberOfLines={1} style={{color: colors.text}}>
+            {lastMessage}
+          </Text>
         </View>
       </TouchableOpacity>
       {/* right section camera icon */}
       <View>
         <TouchableOpacity>
-          <Feather name="camera" size={24} color="black" />
+          <Feather name="camera" size={24} color={colors.text} />
         </TouchableOpacity>
       </View>
     </View>
@@ -162,7 +172,6 @@ function Message({username, lastMessage, profilePicture}) {
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 0,
-    backgroundColor: 'white',
   },
   header: {
     paddingHorizontal: 10,
@@ -170,7 +179,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     height: 60,
-    backgroundColor: 'white',
   },
   row: {flexDirection: 'row', alignItems: 'center'},
   messageBox: {
@@ -192,12 +200,10 @@ const styles = StyleSheet.create({
     width: 64,
     borderRadius: 32,
     alignSelf: 'center',
-    borderColor: '#ddd',
     borderWidth: 1,
   },
   name: {
     fontSize: 14,
-    color: 'black',
     fontWeight: '500',
   },
 });

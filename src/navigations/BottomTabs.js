@@ -6,15 +6,17 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import {getFocusedRouteNameFromRoute} from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 
-import Search from './Search';
-import Reels from './Reels';
-import Shop from './Shop';
-import Home from './Home';
-import Profile from './Profile';
+import Search from '../screens/Search';
+import Reels from '../screens/Reels';
+import Shop from '../screens/Shop';
+import Home from '../screens/Home';
+import Profile from '../screens/Profile';
+
+import {useTheme} from '@react-navigation/native';
 
 const Tab = createBottomTabNavigator();
-
 export default function BottomTabs({navigation, route}) {
+  const {colors} = useTheme();
   React.useLayoutEffect(() => {
     navigation.setOptions({swipeEnabled: getSwiper(route)});
   }, [navigation, route]);
@@ -28,7 +30,7 @@ export default function BottomTabs({navigation, route}) {
         tabBarStyle: {
           elevation: 0,
           shadowOpacity: 0,
-          backgroundColor: 'white',
+          backgroundColor: colors.background,
         },
         tabBarIcon: ({focused, color, size}) => {
           if (route.name === 'Home') {
@@ -87,8 +89,8 @@ export default function BottomTabs({navigation, route}) {
             ));
           }
         },
-        tabBarActiveTintColor: 'black',
-        tabBarInactiveTintColor: 'black',
+        tabBarActiveTintColor: colors.text,
+        tabBarInactiveTintColor: colors.text,
       })}>
       <Tab.Screen name="Home" component={Home} />
       <Tab.Screen name="Search" component={Search} />

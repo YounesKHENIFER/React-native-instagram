@@ -1,24 +1,26 @@
 import React, {useState, useEffect} from 'react';
-import Story from '../components/Story';
+import {useTheme} from '@react-navigation/native';
 
 import {
-  ScrollView,
   StyleSheet,
   Image,
-  RefreshControl,
   View,
   TouchableOpacity,
   FlatList,
 } from 'react-native';
 
+import Story from '../components/Story';
 import AddStory from '../components/AddStory';
 import Post from '../components/Post';
+import useAuth from '../context/useAuth';
+import {posts, stories} from '../../dummyData';
+
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import useToggleTheme from '../context/useToggleTheme';
 
-import {posts, stories} from '../../dummyData';
-import useAuth from '../context/useAuth';
 const Home = ({navigation}) => {
+  const {colors} = useTheme();
   const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = React.useCallback(() => {
@@ -28,40 +30,48 @@ const Home = ({navigation}) => {
     }, 2000);
   }, []);
   return (
-    <View style={styles.container}>
-      <Header navigation={navigation} />
+    <View style={[styles.container, {backgroundColor: colors.background}]}>
+      <Header navigation={navigation} colors={colors} />
       {/* posts */}
-      <Posts navigation={navigation} />
+      <Posts navigation={navigation} colors={colors} />
     </View>
   );
 };
 
-function Header({navigation}) {
+function Header({navigation, colors}) {
+  const {isDark} = useToggleTheme();
   return (
     <View style={styles.header}>
-      <Image style={styles.logo} source={require('../assets/text-logo.png')} />
+      <Image
+        style={isDark ? styles.logoD : styles.logoW}
+        source={
+          isDark
+            ? require('../assets/text-logo-white.png')
+            : require('../assets/text-logo.png')
+        }
+      />
       <View style={{flexDirection: 'row'}}>
         <TouchableOpacity
           style={styles.btn}
-          onPress={() => navigation.navigate('Notifications')}>
-          <FontAwesome name="plus-square-o" size={25} color="black" />
+          onPress={() => navigation.navigate('AddPost')}>
+          <FontAwesome name="plus-square-o" size={25} color={colors.text} />
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.btn}
           onPress={() => navigation.navigate('Notifications')}>
-          <AntDesign name="hearto" size={25} color="black" />
+          <AntDesign name="hearto" size={25} color={colors.text} />
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.btn}
           onPress={() => navigation.navigate('Messages')}>
-          <AntDesign name="message1" size={25} color="black" />
+          <AntDesign name="message1" size={25} color={colors.text} />
         </TouchableOpacity>
       </View>
     </View>
   );
 }
 
-function Stories({navigation}) {
+function Stories({navigation, colors}) {
   const {user} = useAuth();
 
   return (
@@ -89,19 +99,20 @@ function Stories({navigation}) {
         style={{
           marginVertical: 4,
           height: 0.5,
-          backgroundColor: '#ddd',
+          backgroundColor: colors.background,
         }}
       />
     </View>
   );
 }
 
-function Posts({navigation}) {
+function Posts({navigation, colors}) {
   return (
     <View>
       <FlatList
         // refreshing={refreshing}
         // onRefresh={() => onRefresh()}
+        bounces={true}
         contentContainerStyle={styles.container}
         data={posts}
         keyExtractor={(item, i) => i}
@@ -116,7 +127,7 @@ function Posts({navigation}) {
         )}
         ListHeaderComponent={
           <View>
-            <Stories navigation={navigation} />
+            <Stories colors={colors} navigation={navigation} />
           </View>
         }
       />
@@ -127,7 +138,6 @@ function Posts({navigation}) {
 const styles = StyleSheet.create({
   container: {
     // marginBottom: 20,
-    backgroundColor: 'white',
   },
   header: {
     paddingHorizontal: 10,
@@ -136,9 +146,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     height: 60,
   },
-  logo: {
+  logoW: {
     height: 50,
     width: 150,
+  },
+  logoD: {
+    height: 40,
+    width: 160,
   },
   btn: {
     marginHorizontal: 10,
