@@ -11,7 +11,6 @@ import {
 
 import auth from '@react-native-firebase/auth';
 
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 
 import Feather from 'react-native-vector-icons/Feather';
@@ -19,23 +18,27 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import useAuth from '../context/useAuth';
-import EditUser from './EditUser';
+import EditUser from '../components/EditUser';
 import Btn from '../components/Btn';
 import ThreePostsBox from '../components/ThreePostsBox';
 import IconBtn from '../components/IconBtn';
 
-import {posts} from '../dummyData';
+import {posts} from '../../dummyData';
 
-const Stack = createNativeStackNavigator();
 const Tab = createMaterialTopTabNavigator();
 
 export default function Profile({navigation}) {
   const {user} = useAuth();
-  const [modal, setModal] = useState(false);
+  const [editModal, setEditModal] = useState(false);
+  const [menuModal, setMenuModal] = useState(false);
   return (
     <View style={styles.container}>
       <Header navigation={navigation} user={user} />
-      <Informations navigation={navigation} user={user} setModal={setModal} />
+      <Informations
+        navigation={navigation}
+        user={user}
+        setEditModal={setEditModal}
+      />
 
       <Tab.Navigator
         initialRouteName="Posts"
@@ -55,7 +58,7 @@ export default function Profile({navigation}) {
           swipeEnabled: true,
           tabBarIcon: () => {
             if (route.name === 'Posts') {
-              return <Feather name="grid" size={25} />;
+              return <Feather name="grid" size={23} />;
             } else if (route.name === 'Videos') {
               return <Feather name="play-circle" size={25} />;
             } else if (route.name === 'Tags') {
@@ -67,7 +70,11 @@ export default function Profile({navigation}) {
         <Tab.Screen name="Videos" component={Videos} />
         <Tab.Screen name="Tags" component={Tags} />
       </Tab.Navigator>
-      <EditUser setModal={setModal} modal={modal} />
+      <EditUser
+        setEditModal={setEditModal}
+        editModal={editModal}
+        navigation={navigation}
+      />
     </View>
   );
 }
@@ -84,7 +91,12 @@ function Header({navigation, user}) {
         <TouchableOpacity
           style={styles.text}
           onPress={() => navigation.navigate('AddPost')}>
-          <Feather name="plus-square" size={25} color="black" />
+          <Feather
+            name="plus-square"
+            size={25}
+            color="black"
+            onPress={() => navigation.navigate('AddPost')}
+          />
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.text}
@@ -97,7 +109,7 @@ function Header({navigation, user}) {
   );
 }
 
-function Informations({navigation, user, setModal}) {
+function Informations({navigation, user, setEditModal}) {
   return (
     <View>
       <View
@@ -121,7 +133,12 @@ function Informations({navigation, user, setModal}) {
           </TouchableOpacity>
         </View>
       </View>
-      <Text style={{margin: 20}}>{user?.bio}</Text>
+      <View style={{marginHorizontal: 20, marginVertical: 10}}>
+        <Text style={{color: 'black'}}>{user?.displayName}</Text>
+        <Text>
+          Bio : <Text style={{color: 'black'}}>{user?.bio}</Text>
+        </Text>
+      </View>
       <Btn
         title="Edit Profile"
         btnStyle={{
@@ -134,7 +151,7 @@ function Informations({navigation, user, setModal}) {
           color: 'black',
           fontWeight: '600',
         }}
-        onPress={() => setModal(true)}
+        onPress={() => setEditModal(true)}
       />
       <ScrollView
         showsHorizontalScrollIndicator={false}
@@ -201,18 +218,18 @@ function MyModal({modalVisible, setModelVisible}) {
           </TouchableOpacity>
           <IconBtn
             title="Settings"
-            icon={<Feather name="settings" size={25} color="black" />}
+            icon={<Feather name="settings" size={23} color="black" />}
           />
           <IconBtn
             title="Archive"
-            icon={<MaterialIcons name="restore" size={25} color="black" />}
+            icon={<MaterialIcons name="restore" size={23} color="black" />}
           />
           <IconBtn
             title="Your Activity"
             icon={
               <MaterialCommunityIcons
                 name="progress-clock"
-                size={25}
+                size={23}
                 color="black"
               />
             }
@@ -220,19 +237,19 @@ function MyModal({modalVisible, setModelVisible}) {
           <IconBtn
             title="QR Code"
             icon={
-              <MaterialIcons name="qr-code-scanner" size={25} color="black" />
+              <MaterialIcons name="qr-code-scanner" size={23} color="black" />
             }
           />
           <IconBtn
             title="Saved"
-            icon={<Feather name="bookmark" size={25} color="black" />}
+            icon={<Feather name="bookmark" size={23} color="black" />}
           />
           <IconBtn
             title="Close Friends"
             icon={
               <MaterialCommunityIcons
                 name="playlist-star"
-                size={25}
+                size={23}
                 color="black"
               />
             }
@@ -242,14 +259,14 @@ function MyModal({modalVisible, setModelVisible}) {
             icon={
               <MaterialCommunityIcons
                 name="heart-pulse"
-                size={25}
+                size={23}
                 color="black"
               />
             }
           />
           <IconBtn
             title="Log Out"
-            icon={<Feather name="log-out" size={25} color="black" />}
+            icon={<Feather name="log-out" size={23} color="black" />}
             onPress={() => auth().signOut()}
           />
         </View>
@@ -262,6 +279,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: 'white',
     flex: 1,
+    position: 'relative',
   },
   header: {
     flexDirection: 'row',

@@ -13,7 +13,7 @@ export default function Auth() {
   const [screen, setScreen] = useState('login');
   const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
-  const [username, setUsername] = useState('mark_zuck');
+  const [username, setUsername] = useState(null);
   const [error, setError] = useState(null);
   const [loginLoading, setLoginLoading] = useState(false);
 

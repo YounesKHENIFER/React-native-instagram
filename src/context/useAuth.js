@@ -14,40 +14,46 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({children}) => {
   const [user, setUser] = useState(null);
+  const [noUser, setNoUser] = useState(true);
   const [initLoading, setInitLoading] = useState(true);
 
+  //   first auth listener
   useEffect(() => {
     const unsubscribe = auth().onAuthStateChanged(async currentUser => {
+      setUser(currentUser);
       if (currentUser) {
-        firestore()
-          .collection('Users')
-          .doc(currentUser.uid)
-          .get()
-          .then(res => {
-            setUser(res.data());
-          })
-          .catch(e => console.log(e.message))
-          .finally(() => setInitLoading(false));
-      } else {
-        setInitLoading(false);
+        setNoUser(false);
       }
+      setInitLoading(false);
     });
     return unsubscribe;
   }, []);
 
-  const memoValue = useMemo(
-    () => ({
-      user,
-      setUser,
-    }),
-    [user],
-  );
+  // user data firestore listner
+
+  useEffect(() => {
+    if (!noUser) {
+      return firestore()
+        .collection('Users')
+        .doc(user.uid)
+        .onSnapshot(res => {
+          setUser(res.data());
+        });
+    } else {
+      setNoUser(true);
+    }
+  }, [noUser]);
+
   return (
     <>
       {initLoading ? (
         <SplashScreen />
       ) : (
-        <AuthContext.Provider value={memoValue}>
+        <AuthContext.Provider
+          value={{
+            user,
+            setUser,
+          }}>
           {children}
         </AuthContext.Provider>
       )}

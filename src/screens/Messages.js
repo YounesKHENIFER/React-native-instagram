@@ -15,7 +15,7 @@ import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs
 import SearchBox from '../components/SearchBox';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Feather from 'react-native-vector-icons/Feather';
-import {messages} from '../dummyData';
+import {messages} from '../../dummyData';
 
 const Tab = createMaterialTopTabNavigator();
 

@@ -21,7 +21,7 @@ const styles = StyleSheet.create({
   },
   btntxt: {
     color: 'black',
-    fontSize: 20,
+    fontSize: 16,
     marginLeft: 10,
   },
 });

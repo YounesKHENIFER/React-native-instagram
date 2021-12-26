@@ -7,6 +7,7 @@ import Story from './Story';
 import Notifications from './Notifications';
 import Auth from './Auth';
 import useAuth from '../context/useAuth';
+import AddPost from './AddPost';
 
 const Stack = createNativeStackNavigator();
 const StackNav = () => {
@@ -25,6 +26,14 @@ const StackNav = () => {
               title: 'Activity',
             }}
             component={Notifications}
+          />
+          <Stack.Screen
+            name="AddPost"
+            options={{
+              headerShown: true,
+              title: 'Add Post',
+            }}
+            component={AddPost}
           />
         </>
       ) : (

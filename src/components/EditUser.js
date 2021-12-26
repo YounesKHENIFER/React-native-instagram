@@ -6,99 +6,89 @@ import {
   StyleSheet,
   Image,
   Modal,
+  ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 
 import Feather from 'react-native-vector-icons/Feather';
 
-import Btn from '../components/Btn';
-import Input from '../components/Input';
-import ErrorMsg from '../components/ErrorMsg';
+import Btn from './Btn';
+import Input from './Input';
+import ErrorMsg from './ErrorMsg';
 import useAuth from '../context/useAuth';
 
 import ImagePicker from 'react-native-image-crop-picker';
 import storage from '@react-native-firebase/storage';
 import firestore from '@react-native-firebase/firestore';
 
-export default function Edit({setModal, modal}) {
-  const {setUser, user} = useAuth();
+export default function Edit({setEditModal, editModal}) {
+  const {user} = useAuth();
   const [displayName, setDisplayName] = useState(user?.displayName);
   const [username, setUsername] = useState(user?.username);
   const [bio, setBio] = useState(user?.bio);
   const [uploadLoading, setUploadLoading] = useState(false);
-  const [updated, setUpdated] = useState(false);
   const [profilePic, setProfilePic] = useState(user?.profilePicture);
+  const [imageLoading, setImageLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  // image picker
-  const [image, setImage] = useState(null);
+  //   image picker
+  async function openGallery() {
+    try {
+      const image = await ImagePicker.openPicker({
+        width: 500,
+        height: 500,
+        cropping: true,
+      });
 
-  const openGallery = () => {
-    ImagePicker.openPicker({
-      width: 400,
-      height: 400,
-      cropping: true,
-    })
-      .then(image => {
-        setImage(image.path);
-        setProfilePic(image.path);
-      })
-      .catch(e => {});
-  };
+      // getting the image name and add date to make it unique
+      let filename = image.path.substring(image.path.lastIndexOf('/') + 1);
+      const extention = filename.split('.').pop();
+      const name = filename.split('.').slice(0, -1).join('.');
+      filename = name + Date.now() + '.' + extention;
+
+      // uploading image to storage
+      const storageRef = storage().ref(`/images/profilesPictures/${filename}`);
+      setImageLoading(true);
+      await storageRef.putFile(image.path);
+      // getting image download url
+      const url = await storageRef.getDownloadURL();
+      setProfilePic(url);
+      setImageLoading(false);
+    } catch (error) {
+      console.log('image uplod : ', error.message);
+    }
+  }
 
   // handleing changes
-  function handleSave() {
+  async function handleSave() {
     if (username) {
       // changing uploading state
       setUploadLoading(true);
-      if (image) {
-        // getting the image name and add date to make it unique
-        let filename = image.substring(image.lastIndexOf('/') + 1);
-        const extention = filename.split('.').pop();
-        const name = filename.split('.').slice(0, -1).join('.');
-        filename = name + Date.now() + '.' + extention;
-
-        // uploading image to storage
-        const storageRef = storage().ref(
-          `/images/profilesPictures/${filename}`,
-        );
-        storageRef
-          .putFile(image)
-          .then(() =>
-            // getting image download url
-            storageRef
-              .getDownloadURL()
-              .then(url => setProfilePic(url))
-              .catch(e => console.log('inside url', e.message)),
-          )
-          .catch(e => console.log('inside upload img', e.message));
-      }
-
-      // updating the user's info
-      const newUserInfos = {
+      let newUserInfos = {
         username: username,
         profilePicture: profilePic,
         displayName: displayName ?? '',
         bio: bio ?? '',
       };
-      firestore()
-        .collection('Users')
-        .doc(user.uid)
-        .update(newUserInfos)
-        .then(() => {
-          setUser(newUserInfos);
-          setModal(false);
-        })
-        .catch(e => console.log('inside update', e.message));
+      try {
+        await firestore()
+          .collection('Users')
+          .doc(user.uid)
+          .update(newUserInfos);
+
+        setModal(false);
+      } catch (error) {
+        console.log('inside update', error.message);
+      }
 
       // finishing up
       setUploadLoading(false);
-      setUser(true);
     } else {
       Errmsg('Username Is Required');
     }
   }
 
   // handleing Errors
-  const [error, setError] = useState('');
   function Errmsg(err) {
     setError(err);
     return setTimeout(() => {
@@ -109,14 +99,14 @@ export default function Edit({setModal, modal}) {
   return (
     <Modal
       animationType="slide"
-      visible={modal}
+      visible={editModal}
       onRequestClose={() => {
-        setModal(false);
+        setEditModal(false);
       }}>
       <View style={styles.container}>
         {/* header */}
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => setModal(false)}>
+          <TouchableOpacity onPress={() => setEditModal(false)}>
             <Feather name="x" size={30} color="red" />
           </TouchableOpacity>
 
@@ -127,8 +117,15 @@ export default function Edit({setModal, modal}) {
         </View>
         {/* body */}
         <View style={styles.imageBox}>
-          <TouchableOpacity activeOpacity={0.9} onPress={() => openGallery()}>
-            <Image style={styles.image} source={{uri: profilePic}} />
+          <TouchableOpacity
+            style={styles.image}
+            activeOpacity={0.9}
+            onPress={() => openGallery()}>
+            {imageLoading ? (
+              <ActivityIndicator color="#ccc" size="large" />
+            ) : (
+              <Image style={styles.image} source={{uri: profilePic}} />
+            )}
             <View style={styles.plus}>
               <Feather name="camera" size={24} color="gray" />
             </View>
@@ -150,9 +147,11 @@ export default function Edit({setModal, modal}) {
           {!uploadLoading ? (
             <Btn onPress={() => handleSave()} title="SAVE" />
           ) : (
-            <Text>Saving...</Text>
+            <View style={styles.saving}>
+              <ActivityIndicator color="#ccc" size="large" />
+              <Text>Saving...</Text>
+            </View>
           )}
-          {updated && <Text>Profile Update Success</Text>}
         </View>
       </View>
     </Modal>
@@ -164,7 +163,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     flex: 1,
     justifyContent: 'center',
-    paddingBottom: 120,
+    paddingVertical: 120,
   },
   header: {
     position: 'absolute',
@@ -182,7 +181,9 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   image: {
-    backgroundColor: '#ccc',
+    backgroundColor: '#eee',
+    justifyContent: 'center',
+    alignItems: 'center',
     height: 120,
     width: 120,
     borderRadius: 60,
@@ -191,7 +192,7 @@ const styles = StyleSheet.create({
     height: 35,
     width: 35,
     borderRadius: 35 / 2,
-    borderColor: '#ccc',
+    borderColor: 'gray',
     borderWidth: 1,
     position: 'absolute',
     backgroundColor: 'white',
@@ -203,5 +204,9 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     color: 'black',
+  },
+  saving: {
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

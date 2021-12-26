@@ -16,7 +16,7 @@ import Post from '../components/Post';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
-import {posts, stories} from '../dummyData';
+import {posts, stories} from '../../dummyData';
 import useAuth from '../context/useAuth';
 const Home = ({navigation}) => {
   const [refreshing, setRefreshing] = useState(false);
