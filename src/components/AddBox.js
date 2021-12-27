@@ -10,7 +10,7 @@ import {
 import {useNavigation, useTheme} from '@react-navigation/native';
 
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import Sperator from './Sperator';
+import Separator from './Separator';
 export default function AddBox({setBoxModal, boxModal}) {
   const {colors} = useTheme();
   const navigation = useNavigation();
@@ -38,7 +38,7 @@ export default function AddBox({setBoxModal, boxModal}) {
                 size={22}
               />
             </TouchableOpacity>
-            <Sperator />
+            <Separator />
             <TouchableOpacity
               onPress={() => Navigate('Camera')}
               style={[styles.textBox, {backgroundColor: colors.background}]}>
@@ -49,7 +49,7 @@ export default function AddBox({setBoxModal, boxModal}) {
                 size={25}
               />
             </TouchableOpacity>
-            <Sperator />
+            <Separator />
             <TouchableOpacity
               onPress={() => Navigate('AddPost')}
               style={[styles.textBox, {backgroundColor: colors.background}]}>
@@ -60,7 +60,7 @@ export default function AddBox({setBoxModal, boxModal}) {
                 size={25}
               />
             </TouchableOpacity>
-            <Sperator height={0.3} />
+            <Separator height={0.3} />
             <TouchableOpacity
               style={[styles.textBox, {backgroundColor: colors.background}]}>
               <Text style={[styles.text, {color: colors.text}]}>Live</Text>

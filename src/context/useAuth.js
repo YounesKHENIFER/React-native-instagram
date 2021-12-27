@@ -39,8 +39,6 @@ export const AuthProvider = ({children}) => {
         .onSnapshot(res => {
           setUser(res.data());
         });
-    } else {
-      setNoUser(true);
     }
   }, [noUser]);
 

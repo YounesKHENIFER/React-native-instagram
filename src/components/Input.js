@@ -1,5 +1,5 @@
 import React from 'react';
-import {TextInput, StyleSheet} from 'react-native';
+import {TextInput, StyleSheet, View} from 'react-native';
 import {useTheme} from '@react-navigation/native';
 
 const Input = ({
@@ -36,7 +36,6 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
     borderWidth: 1,
     borderRadius: 5,
-    marginVertical: 10,
     marginHorizontal: 15,
     paddingHorizontal: 20,
   },

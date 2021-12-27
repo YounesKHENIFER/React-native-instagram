@@ -6,52 +6,105 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Feather from 'react-native-vector-icons/Feather';
 
-import {useTheme} from '@react-navigation/native';
+import {useNavigation, useTheme} from '@react-navigation/native';
+import useAuth from '../context/useAuth';
 import firestore from '@react-native-firebase/firestore';
 
 export default function Post({item}) {
-  const {userId, postImage, description, createdAt} = item;
+  const {colors} = useTheme();
+  const {user} = useAuth();
+  const {userId, postImage, description, createdAt, postId} = item;
   const [likes, setLikes] = useState([]);
-  const [user, setUser] = useState(null);
+  const [comments, setComments] = useState([]);
+  const [likedPost, setLikedPost] = useState(likes.includes(user.uid));
+  const [postuser, setPostUser] = useState(null);
+
+  //   get post user informations
   useEffect(() => {
     firestore()
       .collection('Users')
       .doc(userId)
       .get()
       .then(user => {
-        setUser(user.data());
+        setPostUser(user.data());
       })
       .catch(e => console.log('Getting Posts Error :', e.message));
   }, [userId]);
 
-  const {colors} = useTheme();
+  //   post like real time listener
+  function onLikeResult(res) {
+    let tmp = [];
+    res.forEach(item => {
+      tmp.push(item.id);
+    });
+    setLikes(tmp);
+  }
+  function onErr(e) {
+    console.log(e.message);
+  }
+  useEffect(
+    () =>
+      firestore()
+        .collection('Posts')
+        .doc(postId)
+        .collection('Likes')
+        .onSnapshot(onLikeResult, onErr),
+    [likedPost],
+  );
+
+  function onComResult(res) {
+    let tmp = [];
+    res.forEach(com => {
+      tmp.push({commentId: com.id, ...com.data()});
+    });
+    setComments(tmp);
+  }
+
+  useEffect(
+    () =>
+      firestore()
+        .collection('Posts')
+        .doc(postId)
+        .collection('Comments')
+        .orderBy('createdAt', 'desc')
+        .onSnapshot(onComResult, onErr),
+    [],
+  );
+
   return (
-    <View style={s.container}>
+    <View style={styles.container}>
       <Header
         colors={colors}
-        username={user?.username}
-        profilePicture={user?.profilePicture}
+        username={postuser?.username}
+        profilePicture={postuser?.profilePicture}
       />
       <PostImage colors={colors} image={postImage} />
-      <Footer colors={colors} />
+      <Footer
+        colors={colors}
+        userId={user.uid}
+        postId={postId}
+        likedPost={likedPost}
+        setLikedPost={setLikedPost}
+      />
       <Description
         colors={colors}
-        username={user?.username}
+        username={postuser?.username}
         likes={likes}
         description={description}
         createdAt={createdAt}
       />
+      <Comments comments={comments} />
     </View>
   );
 }
 
 function Header({username, profilePicture, colors}) {
   return (
-    <View style={s.header}>
+    <View style={styles.header}>
       <View style={{flexDirection: 'row', alignItems: 'center'}}>
         <View>
           <Image
-            style={s.profile}
+            style={styles.profile}
             source={{
               uri: profilePicture,
             }}
@@ -60,7 +113,7 @@ function Header({username, profilePicture, colors}) {
         <View>
           <Text
             style={[
-              s.name,
+              styles.name,
               {
                 color: colors.text,
               },
@@ -80,17 +133,39 @@ function Header({username, profilePicture, colors}) {
 
 function PostImage({image, colors}) {
   return (
-    <View style={[s.imageBox, {backgroundColor: colors.postBack}]}>
-      <Image source={{uri: image}} resizeMode="contain" style={s.image} />
+    <View style={[styles.imageBox, {backgroundColor: colors.postBack}]}>
+      <Image source={{uri: image}} resizeMode="contain" style={styles.image} />
     </View>
   );
 }
 
-function Footer({colors}) {
+function Footer({colors, setLikedPost, postId, userId, likedPost}) {
   const [bookmarked, setBookmarked] = useState(false);
-  const [liked, setLiked] = useState(false);
+  const navigation = useNavigation();
+  //   on like functionality
+  function onLike() {
+    if (!likedPost) {
+      setLikedPost(true);
+      firestore()
+        .collection('Posts')
+        .doc(postId)
+        .collection('Likes')
+        .doc(userId)
+        .set({});
+    } else {
+      setLikedPost(false);
+      console.log('like removed');
+      firestore()
+        .collection('Posts')
+        .doc(postId)
+        .collection('Likes')
+        .doc(userId)
+        .delete();
+    }
+  }
+
   return (
-    <View style={s.footer}>
+    <View style={styles.footer}>
       <View
         style={{
           flexDirection: 'row',
@@ -102,31 +177,38 @@ function Footer({colors}) {
             flexDirection: 'row',
             alignItems: 'center',
           }}>
-          <TouchableOpacity style={s.btn} onPress={() => setLiked(!liked)}>
-            <AntDesign
-              name={liked ? 'heart' : 'hearto'}
-              size={25}
-              color={liked ? 'red' : colors.text}
-            />
-          </TouchableOpacity>
+          <AntDesign
+            name={likedPost ? 'heart' : 'hearto'}
+            size={25}
+            color={likedPost ? 'red' : colors.text}
+            style={styles.btn}
+            onPress={() => onLike()}
+          />
 
-          <TouchableOpacity style={s.btn} onPress={() => {}}>
-            <AntDesign name="message1" size={25} color={colors.text} />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={s.btn} onPress={() => {}}>
-            <Feather name="send" size={25} color={colors.text} />
-          </TouchableOpacity>
-        </View>
-        <TouchableOpacity
-          style={s.btn}
-          onPress={() => setBookmarked(!bookmarked)}>
-          <Ionicons
-            name={bookmarked ? 'bookmark' : 'bookmark-outline'}
+          <AntDesign
+            name="message1"
             size={25}
             color={colors.text}
+            style={styles.btn}
+            onPress={() => navigation.navigate('Comment', {postId: postId})}
           />
-        </TouchableOpacity>
+
+          <Feather
+            style={styles.btn}
+            name="send"
+            size={25}
+            color={colors.text}
+            onPress={() => {}}
+          />
+        </View>
+
+        <Ionicons
+          name={bookmarked ? 'bookmark' : 'bookmark-outline'}
+          size={25}
+          color={colors.text}
+          style={styles.btn}
+          onPress={() => setBookmarked(!bookmarked)}
+        />
       </View>
     </View>
   );
@@ -150,7 +232,7 @@ function Description({likes, description, username, colors, createdAt}) {
       </Text>
       <Text
         style={[
-          s.name,
+          styles.name,
           {
             color: colors.text,
           },
@@ -189,7 +271,20 @@ function Description({likes, description, username, colors, createdAt}) {
   );
 }
 
-const s = StyleSheet.create({
+function Comments({comments}) {
+  if (comments.length) {
+    return (
+      <View style={styles.footer}>
+        <Text>Comments:</Text>
+        <Text>{comments[0].username}</Text>
+        <Text>{comments[0].comment}</Text>
+      </View>
+    );
+  } else {
+    return null;
+  }
+}
+const styles = StyleSheet.create({
   container: {
     marginVertical: 5,
   },

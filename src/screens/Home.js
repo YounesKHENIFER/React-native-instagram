@@ -13,7 +13,8 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import useToggleTheme from '../context/useToggleTheme';
 import AddBox from '../components/AddBox';
-import Sperator from '../components/Sperator';
+import Separator from '../components/Separator';
+import EmptyList from '../components/EmptyList';
 
 import firestore from '@react-native-firebase/firestore';
 
@@ -106,42 +107,46 @@ function Stories({navigation, colors}) {
           <AddStory name="Your Story" picture={user.profilePicture} />
         }
       />
-      <Sperator height={0.3} />
+      <Separator height={0.3} />
     </View>
   );
 }
 
 function Posts({navigation, colors}) {
   let [posts, setPosts] = useState([]);
-
+  const [refreshing, setRefreshing] = useState(false);
   function onResult(newposts) {
     let myPosts = [];
     newposts.forEach(post => {
       myPosts.push({postId: post.id, ...post.data()});
     });
     setPosts(myPosts);
+    setRefreshing(false);
   }
   function onError(e) {
     console.log('Getting Posts Error :', e.message);
   }
 
-  useEffect(
-    () =>
-      firestore()
-        .collection('Posts')
-        .orderBy('createdAt', 'desc')
-        .onSnapshot(onResult, onError),
-    [],
-  );
+  useEffect(() => {
+    return firestore()
+      .collection('Posts')
+      .orderBy('createdAt', 'desc')
+      .onSnapshot(onResult, onError);
+  }, [refreshing]);
   return (
     <View>
       <FlatList
-        // refreshing={refreshing}
-        // onRefresh={() => onRefresh()}
+        refreshing={refreshing}
+        onRefresh={() => setRefreshing(true)}
         bounces={true}
         data={posts}
         keyExtractor={(item, i) => i}
         renderItem={({item}) => <Post item={item} />}
+        ListEmptyComponent={
+          <View style={styles.center}>
+            <EmptyList item="Posts" />
+          </View>
+        }
         ListHeaderComponent={
           <View>
             <Stories colors={colors} navigation={navigation} />
@@ -173,6 +178,9 @@ const styles = StyleSheet.create({
   },
   btn: {
     marginHorizontal: 15,
+  },
+  center: {
+    marginTop: 120,
   },
 });
 export default Home;

@@ -12,6 +12,7 @@ import useAuth from '../context/useAuth';
 import {StatusBar} from 'react-native';
 import {useTheme} from '@react-navigation/native';
 import useToggleTheme from '../context/useToggleTheme';
+import Comment from '../screens/Comment';
 
 const Stack = createNativeStackNavigator();
 const StackNav = () => {
@@ -57,6 +58,16 @@ const StackNav = () => {
                 headerShadowVisible: false,
               }}
               component={AddPost}
+            />
+            <Stack.Screen
+              name="Comment"
+              options={{
+                headerShown: true,
+                title: 'Comments',
+                headerTitleAlign: 'center',
+                headerShadowVisible: false,
+              }}
+              component={Comment}
             />
           </>
         ) : (

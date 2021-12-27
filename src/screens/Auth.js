@@ -15,8 +15,10 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 
 import ErrorMsg from '../components/ErrorMsg';
+import {useTheme} from '@react-navigation/native';
 
 export default function Auth() {
+  const {colors} = useTheme();
   const [screen, setScreen] = useState('login');
   const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
@@ -94,7 +96,7 @@ export default function Auth() {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, {backgroundColor: colors.background}]}>
       <View>
         <View style={styles.imageBox}>
           <Image
@@ -129,8 +131,10 @@ export default function Auth() {
                 <TouchableOpacity
                   style={styles.link}
                   onPress={() => setScreen('register')}>
-                  <Text>Don't Have An Account ? </Text>
-                  <Text style={{color: '#217ac1'}}>Register Now</Text>
+                  <Text style={{color: colors.text}}>
+                    Don't Have An Account ?
+                  </Text>
+                  <Text style={{color: '#217ac1'}}> Register Now</Text>
                 </TouchableOpacity>
               </>
             ) : (
@@ -139,8 +143,10 @@ export default function Auth() {
                 <TouchableOpacity
                   style={styles.link}
                   onPress={() => setScreen('login')}>
-                  <Text>Already Have An Account ? </Text>
-                  <Text style={{color: '#217ac1'}}>Login Now</Text>
+                  <Text style={{color: colors.text}}>
+                    Already Have An Account ?
+                  </Text>
+                  <Text style={{color: '#217ac1'}}> Login Now</Text>
                 </TouchableOpacity>
               </>
             )}
@@ -161,7 +167,6 @@ export default function Auth() {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'white',
     flex: 1,
     justifyContent: 'center',
   },

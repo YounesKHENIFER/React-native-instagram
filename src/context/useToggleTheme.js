@@ -12,7 +12,6 @@ import SplashScreen from '../components/SplashScreen';
 const ThemeContext = createContext();
 
 export const ThemeProvider = ({children}) => {
-  const [initLoading, setInitLoading] = useState(true);
   const [isDark, setisDark] = useState(null);
 
   async function getTheme() {
@@ -21,8 +20,6 @@ export const ThemeProvider = ({children}) => {
       setIsDark(JSON.parse(isDark));
     } catch (e) {
       console.log(e);
-    } finally {
-      setInitLoading(false);
     }
   }
   useEffect(() => {
@@ -39,19 +36,13 @@ export const ThemeProvider = ({children}) => {
   };
 
   return (
-    <>
-      {initLoading ? (
-        <SplashScreen />
-      ) : (
-        <ThemeContext.Provider
-          value={{
-            isDark,
-            setIsDark,
-          }}>
-          {children}
-        </ThemeContext.Provider>
-      )}
-    </>
+    <ThemeContext.Provider
+      value={{
+        isDark,
+        setIsDark,
+      }}>
+      {children}
+    </ThemeContext.Provider>
   );
 };
 
