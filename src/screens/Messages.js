@@ -76,17 +76,14 @@ function Header({navigation, colors}) {
       </TouchableOpacity>
       {/* left section */}
       <View style={styles.row}>
-        <TouchableOpacity>
-          <Feather
-            style={{marginRight: 15}}
-            name="video"
-            size={27}
-            color={colors.text}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity>
-          <Feather name="edit" size={27} color={colors.text} />
-        </TouchableOpacity>
+        <Feather
+          style={{marginRight: 15}}
+          name="video"
+          size={27}
+          color={colors.text}
+        />
+
+        <Feather name="edit" size={27} color={colors.text} />
       </View>
     </View>
   );

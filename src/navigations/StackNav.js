@@ -32,6 +32,8 @@ const StackNav = () => {
           headerStyle: {
             backgroundColor: colors.background,
           },
+          headerTitleAlign: 'center',
+          headerShadowVisible: false,
         }}>
         {user ? (
           <>
@@ -51,6 +53,8 @@ const StackNav = () => {
               options={{
                 headerShown: true,
                 title: 'Add Post',
+                headerTitleAlign: 'center',
+                headerShadowVisible: false,
               }}
               component={AddPost}
             />

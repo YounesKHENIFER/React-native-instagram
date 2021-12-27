@@ -7,10 +7,11 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 export default function SearchBox({onChangeText}) {
   const {colors} = useTheme();
   return (
-    <View style={[styles.container, {backgroundColor: colors.background}]}>
+    <View style={[styles.container, {backgroundColor: colors.inputBackground}]}>
       <Ionicons name="search-outline" size={22} color={colors.text} />
       <TextInput
-        style={{flex: 1}}
+        style={{flex: 1, color: colors.text}}
+        placeholderTextColor={colors.text}
         placeholder="Search"
         onChangeText={text => onChangeText(text)}
       />

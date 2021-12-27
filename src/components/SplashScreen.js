@@ -1,15 +1,18 @@
 import React from 'react';
 import {Image, StyleSheet, Text, View} from 'react-native';
+import {useTheme} from '@react-navigation/native';
 
 export default function SplashScreen() {
+  const {colors} = useTheme();
+
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, {backgroundColor: colors.background}]}>
       <Image
         style={styles.image}
         source={require('../assets/Instagram-logo-transparent-PNG.png')}
       />
       <View style={{alignItems: 'center'}}>
-        <Text style={styles.author}>From</Text>
+        <Text style={[styles.author, {color: colors.text}]}>From</Text>
         <Text style={styles.text}>YOUNES KHENIFER</Text>
       </View>
     </View>

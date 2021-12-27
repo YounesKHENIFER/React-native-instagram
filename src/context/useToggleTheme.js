@@ -7,11 +7,13 @@ import React, {
 } from 'react';
 
 import AsyncStorage from '@react-native-community/async-storage';
+import SplashScreen from '../components/SplashScreen';
 
 const ThemeContext = createContext();
 
 export const ThemeProvider = ({children}) => {
-  const [isDark, setIsDark] = useState(true);
+  const [initLoading, setInitLoading] = useState(true);
+  const [isDark, setisDark] = useState(null);
 
   async function getTheme() {
     try {
@@ -19,14 +21,16 @@ export const ThemeProvider = ({children}) => {
       setIsDark(JSON.parse(isDark));
     } catch (e) {
       console.log(e);
+    } finally {
+      setInitLoading(false);
     }
   }
   useEffect(() => {
     getTheme();
   }, []);
 
-  const setTheme = async value => {
-    setIsDark(value);
+  const setIsDark = async value => {
+    setisDark(value);
     try {
       await AsyncStorage.setItem('AppTheme', JSON.stringify(value));
     } catch (e) {
@@ -35,13 +39,19 @@ export const ThemeProvider = ({children}) => {
   };
 
   return (
-    <ThemeContext.Provider
-      value={{
-        isDark,
-        setIsDark,
-      }}>
-      {children}
-    </ThemeContext.Provider>
+    <>
+      {initLoading ? (
+        <SplashScreen />
+      ) : (
+        <ThemeContext.Provider
+          value={{
+            isDark,
+            setIsDark,
+          }}>
+          {children}
+        </ThemeContext.Provider>
+      )}
+    </>
   );
 };
 

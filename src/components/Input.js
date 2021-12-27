@@ -1,14 +1,30 @@
 import React from 'react';
 import {TextInput, StyleSheet} from 'react-native';
+import {useTheme} from '@react-navigation/native';
 
-const Input = ({onChangeText, placeholder, Mystyles, value, secure}) => {
+const Input = ({
+  onChangeText,
+  placeholder,
+  Mystyles,
+  value,
+  secure,
+  multiline,
+}) => {
+  const {colors} = useTheme();
+
   return (
     <TextInput
       value={value}
-      style={[styles.input, Mystyles]}
+      style={[
+        styles.input,
+        {color: colors.text, backgroundColor: colors.inputBackground},
+        Mystyles,
+      ]}
+      placeholderTextColor={colors.inputPlaceholder}
       placeholder={placeholder}
       onChangeText={onChangeText}
       secureTextEntry={secure}
+      multiline={multiline}
     />
   );
 };
@@ -23,6 +39,5 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     marginHorizontal: 15,
     paddingHorizontal: 20,
-    backgroundColor: '#eee',
   },
 });

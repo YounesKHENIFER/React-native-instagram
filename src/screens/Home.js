@@ -1,13 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import {useTheme} from '@react-navigation/native';
 
-import {
-  StyleSheet,
-  Image,
-  View,
-  TouchableOpacity,
-  FlatList,
-} from 'react-native';
+import {StyleSheet, Image, View, FlatList} from 'react-native';
 
 import Story from '../components/Story';
 import AddStory from '../components/AddStory';
@@ -18,6 +12,10 @@ import {posts, stories} from '../../dummyData';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import useToggleTheme from '../context/useToggleTheme';
+import AddBox from '../components/AddBox';
+import Sperator from '../components/Sperator';
+
+import firestore from '@react-native-firebase/firestore';
 
 const Home = ({navigation}) => {
   const {colors} = useTheme();
@@ -30,7 +28,11 @@ const Home = ({navigation}) => {
     }, 2000);
   }, []);
   return (
-    <View style={[styles.container, {backgroundColor: colors.background}]}>
+    <View
+      style={[
+        styles.container,
+        {backgroundColor: colors.background, marginBottom: 20},
+      ]}>
       <Header navigation={navigation} colors={colors} />
       {/* posts */}
       <Posts navigation={navigation} colors={colors} />
@@ -40,6 +42,7 @@ const Home = ({navigation}) => {
 
 function Header({navigation, colors}) {
   const {isDark} = useToggleTheme();
+  const [boxModal, setBoxModal] = useState(false);
   return (
     <View style={styles.header}>
       <Image
@@ -51,22 +54,30 @@ function Header({navigation, colors}) {
         }
       />
       <View style={{flexDirection: 'row'}}>
-        <TouchableOpacity
+        <FontAwesome
           style={styles.btn}
-          onPress={() => navigation.navigate('AddPost')}>
-          <FontAwesome name="plus-square-o" size={25} color={colors.text} />
-        </TouchableOpacity>
-        <TouchableOpacity
+          name="plus-square-o"
+          size={25}
+          color={colors.text}
+          onPress={() => setBoxModal(true)}
+        />
+
+        <AntDesign
+          name="hearto"
+          size={25}
+          color={colors.text}
+          onPress={() => navigation.navigate('Notifications')}
+        />
+
+        <AntDesign
+          name="message1"
+          size={25}
+          color={colors.text}
           style={styles.btn}
-          onPress={() => navigation.navigate('Notifications')}>
-          <AntDesign name="hearto" size={25} color={colors.text} />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.btn}
-          onPress={() => navigation.navigate('Messages')}>
-          <AntDesign name="message1" size={25} color={colors.text} />
-        </TouchableOpacity>
+          onPress={() => navigation.navigate('Messages')}
+        />
       </View>
+      <AddBox boxModal={boxModal} setBoxModal={setBoxModal} />
     </View>
   );
 }
@@ -95,36 +106,42 @@ function Stories({navigation, colors}) {
           <AddStory name="Your Story" picture={user.profilePicture} />
         }
       />
-      <View
-        style={{
-          marginVertical: 4,
-          height: 0.5,
-          backgroundColor: colors.background,
-        }}
-      />
+      <Sperator height={0.3} />
     </View>
   );
 }
 
 function Posts({navigation, colors}) {
+  let [posts, setPosts] = useState([]);
+
+  function onResult(newposts) {
+    let myPosts = [];
+    newposts.forEach(post => {
+      myPosts.push({postId: post.id, ...post.data()});
+    });
+    setPosts(myPosts);
+  }
+  function onError(e) {
+    console.log('Getting Posts Error :', e.message);
+  }
+
+  useEffect(
+    () =>
+      firestore()
+        .collection('Posts')
+        .orderBy('createdAt', 'desc')
+        .onSnapshot(onResult, onError),
+    [],
+  );
   return (
     <View>
       <FlatList
         // refreshing={refreshing}
         // onRefresh={() => onRefresh()}
         bounces={true}
-        contentContainerStyle={styles.container}
         data={posts}
         keyExtractor={(item, i) => i}
-        renderItem={({item}) => (
-          <Post
-            username={item.username}
-            profilePicture={item.profilePicture}
-            postImage={item.postImage}
-            likes={item.likes}
-            description={item.description}
-          />
-        )}
+        renderItem={({item}) => <Post item={item} />}
         ListHeaderComponent={
           <View>
             <Stories colors={colors} navigation={navigation} />
@@ -137,7 +154,7 @@ function Posts({navigation, colors}) {
 
 const styles = StyleSheet.create({
   container: {
-    // marginBottom: 20,
+    paddingBottom: 100,
   },
   header: {
     paddingHorizontal: 10,
@@ -155,7 +172,7 @@ const styles = StyleSheet.create({
     width: 160,
   },
   btn: {
-    marginHorizontal: 10,
+    marginHorizontal: 15,
   },
 });
 export default Home;

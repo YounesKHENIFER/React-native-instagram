@@ -17,6 +17,8 @@ const MyTheme = {
     primary: 'rgb(255, 45, 85)',
     background: 'white',
     postBack: '#eee',
+    inputBackground: '#eee',
+    inputPlaceholder: 'gray',
   },
 };
 const MyDarkTheme = {
@@ -25,6 +27,8 @@ const MyDarkTheme = {
     ...DarkTheme.colors,
     primary: 'rgb(255, 45, 85)',
     postBack: 'rgb(0, 0, 30)',
+    inputBackground: '#333333',
+    inputPlaceholder: '#eee',
   },
 };
 

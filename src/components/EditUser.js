@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -6,7 +6,6 @@ import {
   StyleSheet,
   Image,
   Modal,
-  ScrollView,
   ActivityIndicator,
 } from 'react-native';
 
@@ -16,13 +15,15 @@ import Btn from './Btn';
 import Input from './Input';
 import ErrorMsg from './ErrorMsg';
 import useAuth from '../context/useAuth';
+import openGallery from '../utils/openGallery';
 
-import ImagePicker from 'react-native-image-crop-picker';
-import storage from '@react-native-firebase/storage';
 import firestore from '@react-native-firebase/firestore';
+
+import {useTheme} from '@react-navigation/native';
 
 export default function Edit({setEditModal, editModal}) {
   const {user} = useAuth();
+  const {colors} = useTheme();
   const [displayName, setDisplayName] = useState(user?.displayName);
   const [username, setUsername] = useState(user?.username);
   const [bio, setBio] = useState(user?.bio);
@@ -30,34 +31,6 @@ export default function Edit({setEditModal, editModal}) {
   const [profilePic, setProfilePic] = useState(user?.profilePicture);
   const [imageLoading, setImageLoading] = useState(false);
   const [error, setError] = useState('');
-
-  //   image picker
-  async function openGallery() {
-    try {
-      const image = await ImagePicker.openPicker({
-        width: 500,
-        height: 500,
-        cropping: true,
-      });
-
-      // getting the image name and add date to make it unique
-      let filename = image.path.substring(image.path.lastIndexOf('/') + 1);
-      const extention = filename.split('.').pop();
-      const name = filename.split('.').slice(0, -1).join('.');
-      filename = name + Date.now() + '.' + extention;
-
-      // uploading image to storage
-      const storageRef = storage().ref(`/images/profilesPictures/${filename}`);
-      setImageLoading(true);
-      await storageRef.putFile(image.path);
-      // getting image download url
-      const url = await storageRef.getDownloadURL();
-      setProfilePic(url);
-      setImageLoading(false);
-    } catch (error) {
-      console.log('image uplod : ', error.message);
-    }
-  }
 
   // handleing changes
   async function handleSave() {
@@ -103,14 +76,14 @@ export default function Edit({setEditModal, editModal}) {
       onRequestClose={() => {
         setEditModal(false);
       }}>
-      <View style={styles.container}>
+      <View style={[styles.container, {backgroundColor: colors.background}]}>
         {/* header */}
         <View style={styles.header}>
           <TouchableOpacity onPress={() => setEditModal(false)}>
             <Feather name="x" size={30} color="red" />
           </TouchableOpacity>
 
-          <Text style={styles.title}>Edit Profile</Text>
+          <Text style={[styles.title, {color: colors.text}]}>Edit Profile</Text>
           <TouchableOpacity onPress={() => handleSave()}>
             <Feather name="check" size={30} color="green" />
           </TouchableOpacity>
@@ -120,9 +93,17 @@ export default function Edit({setEditModal, editModal}) {
           <TouchableOpacity
             style={styles.image}
             activeOpacity={0.9}
-            onPress={() => openGallery()}>
+            onPress={() =>
+              openGallery(
+                500,
+                500,
+                'images/profilesPictures',
+                setImageLoading,
+                setProfilePic,
+              )
+            }>
             {imageLoading ? (
-              <ActivityIndicator color="#ccc" size="large" />
+              <ActivityIndicator color={colors.background} size="large" />
             ) : (
               <Image style={styles.image} source={{uri: profilePic}} />
             )}
@@ -148,8 +129,8 @@ export default function Edit({setEditModal, editModal}) {
             <Btn onPress={() => handleSave()} title="SAVE" />
           ) : (
             <View style={styles.saving}>
-              <ActivityIndicator color="#ccc" size="large" />
-              <Text>Saving...</Text>
+              <ActivityIndicator color={colors.text} size="large" />
+              <Text style={{color: colors.text}}>Saving...</Text>
             </View>
           )}
         </View>
@@ -160,7 +141,6 @@ export default function Edit({setEditModal, editModal}) {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'white',
     flex: 1,
     justifyContent: 'center',
     paddingVertical: 120,
@@ -181,7 +161,7 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   image: {
-    backgroundColor: '#eee',
+    backgroundColor: '#ccc',
     justifyContent: 'center',
     alignItems: 'center',
     height: 120,
@@ -203,7 +183,6 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 18,
-    color: 'black',
   },
   saving: {
     alignItems: 'center',

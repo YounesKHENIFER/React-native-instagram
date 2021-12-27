@@ -3,6 +3,7 @@ import {
   View,
   Text,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   StyleSheet,
   Image,
   ScrollView,
@@ -27,6 +28,7 @@ import IconBtn from '../components/IconBtn';
 import {posts} from '../../dummyData';
 import {useTheme} from '@react-navigation/native';
 import useToggleTheme from '../context/useToggleTheme';
+import AddBox from '../components/AddBox';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -90,6 +92,8 @@ export default function Profile({navigation}) {
 function Header({colors, navigation, user}) {
   const {isDark, setIsDark} = useToggleTheme();
   const [modalVisible, setModelVisible] = useState(false);
+  const [boxModal, setBoxModal] = useState(false);
+
   return (
     <View style={styles.header}>
       <View style={styles.row}>
@@ -105,27 +109,29 @@ function Header({colors, navigation, user}) {
           onValueChange={() => setIsDark(!isDark)}
           value={isDark}
         />
-        <TouchableOpacity
-          style={[styles.text, {color: colors.text}]}
-          onPress={() => navigation.navigate('AddPost')}>
-          <Feather
-            name="plus-square"
-            size={25}
-            color={colors.text}
-            onPress={() => navigation.navigate('AddPost')}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.text, {color: colors.text}]}
-          onPress={() => setModelVisible(true)}>
-          <Feather name="menu" size={25} color={colors.text} />
-        </TouchableOpacity>
+
+        <Feather
+          name="plus-square"
+          size={25}
+          style={styles.icon}
+          color={colors.text}
+          onPress={() => setBoxModal(true)}
+        />
+
+        <Feather
+          name="menu"
+          size={25}
+          style={styles.icon}
+          color={colors.text}
+          onPress={() => setModelVisible(true)}
+        />
       </View>
       <MyModal
         colors={colors}
         modalVisible={modalVisible}
         setModelVisible={setModelVisible}
       />
+      <AddBox boxModal={boxModal} setBoxModal={setBoxModal} />
     </View>
   );
 }
@@ -177,7 +183,7 @@ function Informations({navigation, user, setEditModal, colors}) {
         horizontal
         style={styles.highlightes}>
         <View style={styles.circle}>
-          <Feather name="plus" size={30} color={colors.background} />
+          <Feather name="plus" size={30} color={colors.text} />
         </View>
         <View style={styles.circle} />
         <View style={styles.circle} />
@@ -226,77 +232,81 @@ function MyModal({colors, modalVisible, setModelVisible}) {
       onRequestClose={() => {
         setModelVisible(false);
       }}>
-      <View style={styles.modalContainer}>
-        <View
-          style={[styles.modalContent, {backgroundColor: colors.background}]}>
-          <TouchableOpacity
-            onPress={() => {
-              setModelVisible(false);
-            }}
-            style={{height: 10}}>
-            <View style={[styles.modalClose, {backgroundColor: colors.text}]} />
-          </TouchableOpacity>
-          <IconBtn
-            title="Settings"
-            icon={<Feather name="settings" size={23} color={colors.text} />}
-          />
-          <IconBtn
-            title="Archive"
-            icon={
-              <MaterialIcons name="restore" size={23} color={colors.text} />
-            }
-          />
-          <IconBtn
-            title="Your Activity"
-            icon={
-              <MaterialCommunityIcons
-                name="progress-clock"
-                size={23}
-                color={colors.text}
+      <TouchableWithoutFeedback onPress={() => setModelVisible(false)}>
+        <View style={styles.modalContainer}>
+          <View
+            style={[styles.modalContent, {backgroundColor: colors.background}]}>
+            <TouchableOpacity
+              onPress={() => {
+                setModelVisible(false);
+              }}
+              style={{height: 10}}>
+              <View
+                style={[styles.modalClose, {backgroundColor: colors.text}]}
               />
-            }
-          />
-          <IconBtn
-            title="QR Code"
-            icon={
-              <MaterialIcons
-                name="qr-code-scanner"
-                size={23}
-                color={colors.text}
-              />
-            }
-          />
-          <IconBtn
-            title="Saved"
-            icon={<Feather name="bookmark" size={23} color={colors.text} />}
-          />
-          <IconBtn
-            title="Close Friends"
-            icon={
-              <MaterialCommunityIcons
-                name="playlist-star"
-                size={23}
-                color={colors.text}
-              />
-            }
-          />
-          <IconBtn
-            title="COVID-19 Information Center"
-            icon={
-              <MaterialCommunityIcons
-                name="heart-pulse"
-                size={23}
-                color={colors.text}
-              />
-            }
-          />
-          <IconBtn
-            title="Log Out"
-            icon={<Feather name="log-out" size={23} color={colors.text} />}
-            onPress={() => auth().signOut()}
-          />
+            </TouchableOpacity>
+            <IconBtn
+              title="Settings"
+              icon={<Feather name="settings" size={23} color={colors.text} />}
+            />
+            <IconBtn
+              title="Archive"
+              icon={
+                <MaterialIcons name="restore" size={23} color={colors.text} />
+              }
+            />
+            <IconBtn
+              title="Your Activity"
+              icon={
+                <MaterialCommunityIcons
+                  name="progress-clock"
+                  size={23}
+                  color={colors.text}
+                />
+              }
+            />
+            <IconBtn
+              title="QR Code"
+              icon={
+                <MaterialIcons
+                  name="qr-code-scanner"
+                  size={23}
+                  color={colors.text}
+                />
+              }
+            />
+            <IconBtn
+              title="Saved"
+              icon={<Feather name="bookmark" size={23} color={colors.text} />}
+            />
+            <IconBtn
+              title="Close Friends"
+              icon={
+                <MaterialCommunityIcons
+                  name="playlist-star"
+                  size={23}
+                  color={colors.text}
+                />
+              }
+            />
+            <IconBtn
+              title="COVID-19 Information Center"
+              icon={
+                <MaterialCommunityIcons
+                  name="heart-pulse"
+                  size={23}
+                  color={colors.text}
+                />
+              }
+            />
+            <IconBtn
+              title="Log Out"
+              icon={<Feather name="log-out" size={23} color={colors.text} />}
+              onPress={() => auth().signOut()}
+            />
+          </View>
         </View>
-      </View>
+      </TouchableWithoutFeedback>
     </Modal>
   );
 }
@@ -324,6 +334,9 @@ const styles = StyleSheet.create({
   text: {
     marginLeft: 10,
     fontSize: 17,
+  },
+  icon: {
+    marginLeft: 10,
   },
   profile: {
     height: 95,

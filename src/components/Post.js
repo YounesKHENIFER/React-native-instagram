@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import {StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
 
@@ -7,29 +7,39 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Feather from 'react-native-vector-icons/Feather';
 
 import {useTheme} from '@react-navigation/native';
+import firestore from '@react-native-firebase/firestore';
 
-export default function Post({
-  username,
-  profilePicture,
-  postImage,
-  likes,
-  description,
-}) {
+export default function Post({item}) {
+  const {userId, postImage, description, createdAt} = item;
+  const [likes, setLikes] = useState([]);
+  const [user, setUser] = useState(null);
+  useEffect(() => {
+    firestore()
+      .collection('Users')
+      .doc(userId)
+      .get()
+      .then(user => {
+        setUser(user.data());
+      })
+      .catch(e => console.log('Getting Posts Error :', e.message));
+  }, [userId]);
+
   const {colors} = useTheme();
   return (
     <View style={s.container}>
       <Header
         colors={colors}
-        username={username}
-        profilePicture={profilePicture}
+        username={user?.username}
+        profilePicture={user?.profilePicture}
       />
       <PostImage colors={colors} image={postImage} />
       <Footer colors={colors} />
       <Description
         colors={colors}
-        username={username}
+        username={user?.username}
         likes={likes}
         description={description}
+        createdAt={createdAt}
       />
     </View>
   );
@@ -122,8 +132,12 @@ function Footer({colors}) {
   );
 }
 
-function Description({likes, description, username, colors}) {
+function Description({likes, description, username, colors, createdAt}) {
   const [nlines, setNlines] = useState(true);
+  const date =
+    new Date(createdAt._seconds * 1000).toLocaleDateString('en-US') +
+    ' ' +
+    new Date(createdAt._seconds * 1000).toLocaleTimeString();
   return (
     <View style={{paddingHorizontal: 10}}>
       <Text
@@ -132,7 +146,7 @@ function Description({likes, description, username, colors}) {
           fontSize: 15,
           color: colors.text,
         }}>
-        {likes} Likes
+        {likes.length} Likes
       </Text>
       <Text
         style={[
@@ -164,6 +178,13 @@ function Description({likes, description, username, colors}) {
           </Text>
         </TouchableOpacity>
       )}
+      <Text
+        style={{
+          color: colors.inputPlaceholder,
+          fontSize: 12,
+        }}>
+        {date}
+      </Text>
     </View>
   );
 }
