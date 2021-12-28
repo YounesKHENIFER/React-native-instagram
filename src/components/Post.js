@@ -1,6 +1,13 @@
 import React, {useEffect, useState} from 'react';
 
-import {StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+} from 'react-native';
 
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -11,6 +18,7 @@ import useAuth from '../context/useAuth';
 import firestore from '@react-native-firebase/firestore';
 
 export default function Post({item}) {
+  const navigation = useNavigation();
   const {colors} = useTheme();
   const {user} = useAuth();
   const {userId, postImage, description, createdAt, postId} = item;
@@ -32,34 +40,30 @@ export default function Post({item}) {
   }, [userId]);
 
   //   post like real time listener
-  function onLikeResult(res) {
+  function onResult(res, set) {
     let tmp = [];
     res.forEach(item => {
       tmp.push(item.id);
     });
-    setLikes(tmp);
+    set(tmp);
   }
+
   function onErr(e) {
     console.log(e.message);
   }
+  //   getting likes real time listner
+
   useEffect(
     () =>
       firestore()
         .collection('Posts')
         .doc(postId)
         .collection('Likes')
-        .onSnapshot(onLikeResult, onErr),
+        .onSnapshot(res => onResult(res, setLikes), onErr),
     [likedPost],
   );
 
-  function onComResult(res) {
-    let tmp = [];
-    res.forEach(com => {
-      tmp.push({commentId: com.id, ...com.data()});
-    });
-    setComments(tmp);
-  }
-
+  //   getting comments real time listner
   useEffect(
     () =>
       firestore()
@@ -67,16 +71,28 @@ export default function Post({item}) {
         .doc(postId)
         .collection('Comments')
         .orderBy('createdAt', 'desc')
-        .onSnapshot(onComResult, onErr),
+        .onSnapshot(res => onResult(res, setComments), onErr),
     [],
   );
 
+  //   handle navigation to user profile
+  function navigateToUser() {
+    if (postuser.uid === user.uid) {
+      navigation.navigate('Profile');
+    } else {
+      navigation.navigate('User', {
+        userId: postuser.uid,
+        username: postuser.username,
+      });
+    }
+  }
   return (
     <View style={styles.container}>
       <Header
         colors={colors}
         username={postuser?.username}
         profilePicture={postuser?.profilePicture}
+        navigateToUser={navigateToUser}
       />
       <PostImage colors={colors} image={postImage} />
       <Footer
@@ -85,6 +101,7 @@ export default function Post({item}) {
         postId={postId}
         likedPost={likedPost}
         setLikedPost={setLikedPost}
+        navigation={navigation}
       />
       <Description
         colors={colors}
@@ -92,38 +109,41 @@ export default function Post({item}) {
         likes={likes}
         description={description}
         createdAt={createdAt}
+        navigateToUser={navigateToUser}
       />
       <Comments comments={comments} />
     </View>
   );
 }
 
-function Header({username, profilePicture, colors}) {
+function Header({profilePicture, username, colors, navigateToUser}) {
   return (
     <View style={styles.header}>
-      <View style={{flexDirection: 'row', alignItems: 'center'}}>
-        <View>
-          <Image
-            style={styles.profile}
-            source={{
-              uri: profilePicture,
-            }}
-          />
+      <TouchableWithoutFeedback onPress={() => navigateToUser()}>
+        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+          <View>
+            <Image
+              style={styles.profile}
+              source={{
+                uri: profilePicture,
+              }}
+            />
+          </View>
+          <View>
+            <Text
+              style={[
+                styles.name,
+                {
+                  color: colors.text,
+                },
+              ]}
+              circle
+              numberOfLines={1}>
+              {username}
+            </Text>
+          </View>
         </View>
-        <View>
-          <Text
-            style={[
-              styles.name,
-              {
-                color: colors.text,
-              },
-            ]}
-            circle
-            numberOfLines={1}>
-            {username}
-          </Text>
-        </View>
-      </View>
+      </TouchableWithoutFeedback>
       <TouchableOpacity>
         <Feather name="more-vertical" size={25} color={colors.text} />
       </TouchableOpacity>
@@ -139,9 +159,8 @@ function PostImage({image, colors}) {
   );
 }
 
-function Footer({colors, setLikedPost, postId, userId, likedPost}) {
+function Footer({colors, setLikedPost, postId, userId, likedPost, navigation}) {
   const [bookmarked, setBookmarked] = useState(false);
-  const navigation = useNavigation();
   //   on like functionality
   function onLike() {
     if (!likedPost) {
@@ -214,7 +233,14 @@ function Footer({colors, setLikedPost, postId, userId, likedPost}) {
   );
 }
 
-function Description({likes, description, username, colors, createdAt}) {
+function Description({
+  likes,
+  description,
+  username,
+  colors,
+  createdAt,
+  navigateToUser,
+}) {
   const [nlines, setNlines] = useState(true);
   const date =
     new Date(createdAt._seconds * 1000).toLocaleDateString('en-US') +
@@ -230,15 +256,17 @@ function Description({likes, description, username, colors, createdAt}) {
         }}>
         {likes.length} Likes
       </Text>
-      <Text
-        style={[
-          styles.name,
-          {
-            color: colors.text,
-          },
-        ]}>
-        {username}
-      </Text>
+      <TouchableWithoutFeedback onPress={() => navigateToUser()}>
+        <Text
+          style={[
+            styles.name,
+            {
+              color: colors.text,
+            },
+          ]}>
+          {username}
+        </Text>
+      </TouchableWithoutFeedback>
       <Text
         style={{
           color: colors.text,

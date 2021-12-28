@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -12,31 +12,47 @@ import {
 } from 'react-native';
 
 import auth from '@react-native-firebase/auth';
-
-import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
+import firestore from '@react-native-firebase/firestore';
 
 import Feather from 'react-native-vector-icons/Feather';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {useTheme} from '@react-navigation/native';
 
 import useAuth from '../context/useAuth';
 import EditUser from '../components/EditUser';
 import Btn from '../components/Btn';
-import ThreePostsBox from '../components/ThreePostsBox';
 import IconBtn from '../components/IconBtn';
-
-import {posts} from '../../dummyData';
-import {useTheme} from '@react-navigation/native';
 import useToggleTheme from '../context/useToggleTheme';
 import AddBox from '../components/AddBox';
-
-const Tab = createMaterialTopTabNavigator();
+import ProfileNavigation from '../components/ProfileNavigation';
+import ProfileHeader from '../components/ProfileHeader';
 
 export default function Profile({navigation}) {
   const {user} = useAuth();
   const {colors} = useTheme();
-
   const [editModal, setEditModal] = useState(false);
+  const [posts, setPosts] = useState([]);
+
+  //   getting user posts
+  function getPosts() {
+    firestore()
+      .collection('Posts')
+      .where('userId', '==', user.uid)
+      .get()
+      .then(res => {
+        let tmp = [];
+        res.forEach(post => {
+          tmp.push({id: post.id, ...post.data()});
+        });
+        setPosts(tmp);
+      })
+      .catch(e => console.log('Getting Posts Error :', e.message));
+  }
+
+  useEffect(() => {
+    getPosts();
+  }, []);
   return (
     <View style={[styles.container, {backgroundColor: colors.background}]}>
       <Header colors={colors} navigation={navigation} user={user} />
@@ -45,40 +61,10 @@ export default function Profile({navigation}) {
         navigation={navigation}
         user={user}
         setEditModal={setEditModal}
+        postsLength={posts.length}
       />
 
-      <Tab.Navigator
-        initialRouteName="Posts"
-        screenOptions={({route}) => ({
-          tabBarShowLabel: false,
-          tabBarShowIcon: true,
-          tabBarActiveTintColor: colors.text,
-          tabBarInactiveTintColor: colors.text,
-          tabBarStyle: {
-            backgroundColor: colors.background,
-            elevation: 0,
-            borderBottomColor: colors.text,
-            borderBottomWidth: 1,
-          },
-          tabBarIndicatorStyle: {
-            backgroundColor: colors.text,
-            height: 1.5,
-          },
-          swipeEnabled: true,
-          tabBarIcon: ({color}) => {
-            if (route.name === 'Posts') {
-              return <Feather name="grid" size={23} color={color} />;
-            } else if (route.name === 'Videos') {
-              return <Feather name="play-circle" size={25} color={color} />;
-            } else if (route.name === 'Tags') {
-              return <Feather name="tag" size={25} color={color} />;
-            }
-          },
-        })}>
-        <Tab.Screen name="Posts" component={Posts} />
-        <Tab.Screen name="Videos" component={Videos} />
-        <Tab.Screen name="Tags" component={Tags} />
-      </Tab.Navigator>
+      <ProfileNavigation posts={posts} />
       <EditUser
         setEditModal={setEditModal}
         editModal={editModal}
@@ -136,34 +122,10 @@ function Header({colors, navigation, user}) {
   );
 }
 
-function Informations({navigation, user, setEditModal, colors}) {
+function Informations({user, setEditModal, colors, postsLength}) {
   return (
     <View>
-      <View
-        style={[
-          styles.row,
-          {justifyContent: 'space-between', paddingHorizontal: 20},
-        ]}>
-        <Image style={styles.profile} source={{uri: user?.profilePicture}} />
-        <View style={styles.row}>
-          <TouchableOpacity style={styles.column}>
-            <Text style={[styles.number, {color: colors.text}]}>6</Text>
-            <Text style={{color: colors.text}}>Posts</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.column}>
-            <Text style={[styles.number, {color: colors.text}]}>61</Text>
-            <Text style={{color: colors.text}}>Followers</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.column}>
-            <Text style={[styles.number, {color: colors.text}]}>168</Text>
-            <Text style={{color: colors.text}}>Following</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-      <View style={{marginHorizontal: 20, marginVertical: 10}}>
-        <Text style={{color: colors.text}}>{user?.displayName}</Text>
-        <Text style={{color: colors.text}}>Bio : {user?.bio}</Text>
-      </View>
+      <ProfileHeader profileUser={user} postsLength={postsLength} />
       <Btn
         title="Edit Profile"
         btnStyle={{
@@ -183,7 +145,7 @@ function Informations({navigation, user, setEditModal, colors}) {
         horizontal
         style={styles.highlightes}>
         <View style={styles.circle}>
-          <Feather name="plus" size={30} color={colors.text} />
+          <Feather name="plus" size={30} color="black" />
         </View>
         <View style={styles.circle} />
         <View style={styles.circle} />
@@ -191,34 +153,6 @@ function Informations({navigation, user, setEditModal, colors}) {
         <View style={styles.circle} />
         <View style={styles.circle} />
       </ScrollView>
-    </View>
-  );
-}
-
-function Posts() {
-  //  TODO : replace posts with real posts
-  const data = posts;
-  return (
-    <View style={styles.container}>
-      <ThreePostsBox data={data} forItem="Posts" />
-    </View>
-  );
-}
-function Videos() {
-  //  TODO : replace data with real vidoes
-  const data = [];
-  return (
-    <View style={styles.container}>
-      <ThreePostsBox data={data} forItem="Videos" />
-    </View>
-  );
-}
-function Tags() {
-  //  TODO : replace data with real tags
-  const data = [];
-  return (
-    <View style={styles.container}>
-      <ThreePostsBox data={data} forItem="Tags" />
     </View>
   );
 }

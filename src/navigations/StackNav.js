@@ -1,5 +1,8 @@
-import React, {useEffect} from 'react';
+import React from 'react';
+import {StatusBar, Text} from 'react-native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {useTheme} from '@react-navigation/native';
+import Feather from 'react-native-vector-icons/Feather';
 
 import TopTabs from './TopTabs';
 import Message from '../screens/Message';
@@ -7,12 +10,10 @@ import Story from '../screens/Story';
 import Notifications from '../screens/Notifications';
 import Auth from '../screens/Auth';
 import AddPost from '../screens/AddPost';
-
 import useAuth from '../context/useAuth';
-import {StatusBar} from 'react-native';
-import {useTheme} from '@react-navigation/native';
 import useToggleTheme from '../context/useToggleTheme';
 import Comment from '../screens/Comment';
+import User from '../screens/User';
 
 const Stack = createNativeStackNavigator();
 const StackNav = () => {
@@ -54,8 +55,6 @@ const StackNav = () => {
               options={{
                 headerShown: true,
                 title: 'Add Post',
-                headerTitleAlign: 'center',
-                headerShadowVisible: false,
               }}
               component={AddPost}
             />
@@ -64,10 +63,21 @@ const StackNav = () => {
               options={{
                 headerShown: true,
                 title: 'Comments',
-                headerTitleAlign: 'center',
-                headerShadowVisible: false,
               }}
               component={Comment}
+            />
+            <Stack.Screen
+              name="User"
+              options={{
+                headerShown: true,
+                headerShadowVisible: false,
+                title: '',
+                headerTitleAlign: 'left',
+                headerRight: () => (
+                  <Feather name="more-vertical" color={colors.text} size={25} />
+                ),
+              }}
+              component={User}
             />
           </>
         ) : (

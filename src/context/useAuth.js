@@ -31,16 +31,16 @@ export const AuthProvider = ({children}) => {
 
   // user data firestore listner
 
-  useEffect(() => {
-    if (!noUser) {
-      return firestore()
+  useEffect(
+    () =>
+      firestore()
         .collection('Users')
-        .doc(user.uid)
+        .doc(user?.uid)
         .onSnapshot(res => {
           setUser(res.data());
-        });
-    }
-  }, [noUser]);
+        }),
+    [noUser],
+  );
 
   return (
     <>

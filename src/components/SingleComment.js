@@ -1,21 +1,9 @@
 import React, {useEffect, useState} from 'react';
 
-import {
-  Text,
-  View,
-  StyleSheet,
-  Image,
-  ActivityIndicator,
-  TouchableOpacity,
-} from 'react-native';
+import {Text, View, StyleSheet, Image} from 'react-native';
 import {useTheme} from '@react-navigation/native';
 
-import openGallery from '../utils/openGallery';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import Input from './Input';
-import Separator from './Separator';
 import firestore from '@react-native-firebase/firestore';
-import useAuth from '../context/useAuth';
 
 export default function SingleComment({userId, comment, createdAt}) {
   const {colors} = useTheme();

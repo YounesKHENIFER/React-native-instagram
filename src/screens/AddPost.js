@@ -31,6 +31,7 @@ export default function AddPost({navigation}) {
           userId: user.uid,
           description: description,
           postImage: postImage,
+          type: 'image',
           createdAt: firestore.FieldValue.serverTimestamp(),
         })
         .then(() => navigation.navigate('MainApp'))

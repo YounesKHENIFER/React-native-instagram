@@ -37,6 +37,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 5,
     marginHorizontal: 15,
+    marginBottom: 5,
     paddingHorizontal: 20,
   },
 });
