@@ -1,33 +1,16 @@
-import React, {useState} from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  StyleSheet,
-  Image,
-  ScrollView,
-  Modal,
-  Switch,
-} from 'react-native';
+import React from 'react';
+import {View, StyleSheet, ActivityIndicator} from 'react-native';
 
-import auth from '@react-native-firebase/auth';
+import {useTheme} from '@react-navigation/native';
 
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 
 import Feather from 'react-native-vector-icons/Feather';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-
-import {posts} from '../../dummyData';
-import {useTheme} from '@react-navigation/native';
 import ThreePostsBox from '../components/ThreePostsBox';
-import useAuth from '../context/useAuth';
 
 const Tab = createMaterialTopTabNavigator();
 
-export default function ProfileNavigation({posts}) {
-  const {user} = useAuth();
+export default function ProfileNavigation({posts, loading}) {
   const {colors} = useTheme();
 
   return (
@@ -59,19 +42,29 @@ export default function ProfileNavigation({posts}) {
           }
         },
       })}>
-      <Tab.Screen name="Posts">{() => <Posts posts={posts} />}</Tab.Screen>
+      <Tab.Screen name="Posts">
+        {() => <Posts posts={posts} loading={loading} />}
+      </Tab.Screen>
       <Tab.Screen name="Videos" component={Videos} />
       <Tab.Screen name="Tags" component={Tags} />
     </Tab.Navigator>
   );
 }
 
-function Posts({posts}) {
-  //  TODO : replace posts with real posts
-  const data = posts;
+function Posts({posts, loading}) {
   return (
     <View style={styles.container}>
-      <ThreePostsBox data={data} forItem="Posts" />
+      {loading ? (
+        <View
+          style={{
+            height: '100%',
+            justifyContent: 'center',
+          }}>
+          <ActivityIndicator size="large" color="gray" />
+        </View>
+      ) : (
+        <ThreePostsBox data={posts} forItem="Posts" />
+      )}
     </View>
   );
 }

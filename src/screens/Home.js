@@ -1,13 +1,19 @@
 import React, {useState, useEffect} from 'react';
 import {useTheme} from '@react-navigation/native';
 
-import {StyleSheet, Image, View, FlatList} from 'react-native';
+import {
+  StyleSheet,
+  Image,
+  View,
+  FlatList,
+  ActivityIndicator,
+} from 'react-native';
 
 import Story from '../components/Story';
 import AddStory from '../components/AddStory';
 import Post from '../components/Post';
 import useAuth from '../context/useAuth';
-import {posts, stories} from '../../dummyData';
+import {stories} from '../../dummyData';
 
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -113,46 +119,59 @@ function Stories({navigation, colors}) {
 }
 
 function Posts({navigation, colors}) {
-  let [posts, setPosts] = useState([]);
+  let [posts, setPosts] = useState();
   const [refreshing, setRefreshing] = useState(false);
+  const [loading, setLoading] = useState(true);
   function onResult(newposts) {
     let myPosts = [];
     newposts.forEach(post => {
       myPosts.push({postId: post.id, ...post.data()});
     });
     setPosts(myPosts);
+    setLoading(false);
     setRefreshing(false);
   }
   function onError(e) {
     console.log('Getting Posts Error :', e.message);
   }
-
-  useEffect(() => {
-    return firestore()
-      .collection('Posts')
-      .orderBy('createdAt', 'desc')
-      .onSnapshot(onResult, onError);
-  }, [refreshing]);
+  useEffect(
+    () =>
+      firestore()
+        .collection('Posts')
+        .orderBy('createdAt', 'desc')
+        .onSnapshot(onResult, onError),
+    [refreshing],
+  );
   return (
     <View>
-      <FlatList
-        refreshing={refreshing}
-        onRefresh={() => setRefreshing(true)}
-        bounces={true}
-        data={posts}
-        keyExtractor={(item, i) => i}
-        renderItem={({item}) => <Post item={item} />}
-        ListEmptyComponent={
-          <View style={styles.center}>
-            <EmptyList item="Posts" />
-          </View>
-        }
-        ListHeaderComponent={
-          <View>
-            <Stories colors={colors} navigation={navigation} />
-          </View>
-        }
-      />
+      {loading ? (
+        <View
+          style={{
+            height: '100%',
+            justifyContent: 'center',
+          }}>
+          <ActivityIndicator size="large" color="gray" />
+        </View>
+      ) : (
+        <FlatList
+          refreshing={refreshing}
+          onRefresh={() => setRefreshing(true)}
+          bounces={true}
+          data={posts}
+          keyExtractor={(item, i) => i}
+          renderItem={({item}) => <Post item={item} />}
+          ListEmptyComponent={
+            <View style={styles.center}>
+              <EmptyList item="Posts" />
+            </View>
+          }
+          ListHeaderComponent={
+            <View>
+              <Stories colors={colors} navigation={navigation} />
+            </View>
+          }
+        />
+      )}
     </View>
   );
 }

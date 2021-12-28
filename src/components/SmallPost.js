@@ -1,11 +1,23 @@
-import React from 'react';
-import {StyleSheet, View, Dimensions, Image} from 'react-native';
+import React, {useState} from 'react';
+import {StyleSheet, Dimensions, Image, TouchableOpacity} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
+import PostModal from './PostModal';
 
-export default function SmallPost({item}) {
+export default function SmallPost({post}) {
+  const navigation = useNavigation();
+  const [modal, setModal] = useState(false);
   return (
-    <View style={styles.container}>
-      <Image style={styles.image} source={{uri: item.postImage}} />
-    </View>
+    <>
+      <TouchableOpacity
+        activeOpacity={0.8}
+        style={styles.container}
+        onLongPress={() => setModal(true)}
+        onPressOut={() => setModal(false)}
+        onPress={() => navigation.push('SinglePost', {postId: post.id})}>
+        <Image style={styles.image} source={{uri: post.postImage}} />
+      </TouchableOpacity>
+      <PostModal post={post} modal={modal} setModal={setModal} />
+    </>
   );
 }
 

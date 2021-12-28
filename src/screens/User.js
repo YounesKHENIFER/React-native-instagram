@@ -1,27 +1,9 @@
 import React, {useEffect, useState} from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  StyleSheet,
-  Image,
-  ScrollView,
-  Modal,
-  Switch,
-} from 'react-native';
-
+import {View, StyleSheet} from 'react-native';
+import {useTheme} from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
 
-import Feather from 'react-native-vector-icons/Feather';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-
 import useAuth from '../context/useAuth';
-import Btn from '../components/Btn';
-
-import {useTheme} from '@react-navigation/native';
-
 import ProfileNavigation from '../components/ProfileNavigation';
 import ProfileHeader from '../components/ProfileHeader';
 
@@ -30,7 +12,7 @@ export default function User({navigation, route}) {
   const {colors} = useTheme();
   const [userProfile, setUserProfile] = useState();
   const [posts, setPosts] = useState([]);
-
+  const [loading, setLoading] = useState(true);
   // set the screen title as user's username and check if user is the logged.in user
   useEffect(() => {
     if (route.params.userId === user.uid) {
@@ -52,6 +34,7 @@ export default function User({navigation, route}) {
           tmp.push({id: post.id, ...post.data()});
         });
         setPosts(tmp);
+        setLoading(false);
       })
       .catch(e => console.log('Getting Posts Error :', e.message));
   }
@@ -76,7 +59,7 @@ export default function User({navigation, route}) {
       <View>
         <ProfileHeader profileUser={userProfile} postsLength={posts.length} />
       </View>
-      <ProfileNavigation posts={posts} />
+      <ProfileNavigation posts={posts} loading={loading} />
     </View>
   );
 }

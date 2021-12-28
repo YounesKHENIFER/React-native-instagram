@@ -14,6 +14,7 @@ import useAuth from '../context/useAuth';
 import useToggleTheme from '../context/useToggleTheme';
 import Comment from '../screens/Comment';
 import User from '../screens/User';
+import SinglePost from '../screens/SinglePost';
 
 const Stack = createNativeStackNavigator();
 const StackNav = () => {
@@ -78,6 +79,16 @@ const StackNav = () => {
                 ),
               }}
               component={User}
+            />
+            <Stack.Screen
+              name="SinglePost"
+              options={{
+                headerShown: true,
+                headerShadowVisible: false,
+                title: 'Back',
+                headerTitleAlign: 'left',
+              }}
+              component={SinglePost}
             />
           </>
         ) : (

@@ -132,15 +132,15 @@ export default function ProfileHeader({profileUser, postsLength}) {
         </View>
       </View>
       <View style={{marginHorizontal: 20, marginVertical: 10}}>
-        <Text style={{color: colors.text}}>{user?.displayName}</Text>
-        <Text style={{color: colors.text}}>Bio : {user?.bio}</Text>
+        <Text style={{color: colors.text}}>{profileUser?.displayName}</Text>
+        <Text style={{color: colors.text}}>Bio : {profileUser?.bio}</Text>
       </View>
       {profileUser?.uid !== user?.uid && (
         <Btn
           title={isFollowing ? 'Unfollow' : 'Follow'}
           btnStyle={{
             padding: 5,
-            backgroundColor: isFollowing ? 'red' : '#217ac1',
+            backgroundColor: isFollowing ? '#b71c1c' : '#217ac1',
           }}
           txtStyle={{
             fontWeight: '600',

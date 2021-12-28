@@ -59,38 +59,7 @@ const styles = StyleSheet.create({
     padding: 20,
     alignItems: 'center',
   },
-  imageBox: {
-    marginVertical: 30,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    position: 'relative',
-  },
-  image: {
-    backgroundColor: '#ccc',
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: 120,
-    width: 120,
-    borderRadius: 60,
-  },
-  plus: {
-    height: 35,
-    width: 35,
-    borderRadius: 35 / 2,
-    borderColor: 'gray',
-    borderWidth: 1,
-    position: 'absolute',
-    backgroundColor: 'white',
-    bottom: 5,
-    right: 5,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   title: {
     fontSize: 18,
-  },
-  saving: {
-    alignItems: 'center',
-    justifyContent: 'center',
   },
 });

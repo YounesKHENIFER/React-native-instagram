@@ -4,7 +4,7 @@ import {useTheme} from '@react-navigation/native';
 
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-export default function SearchBox({onChangeText}) {
+export default function SearchBox({onChangeText, focused, onPress}) {
   const {colors} = useTheme();
   return (
     <View style={[styles.container, {backgroundColor: colors.inputBackground}]}>
@@ -14,6 +14,8 @@ export default function SearchBox({onChangeText}) {
         placeholderTextColor={colors.text}
         placeholder="Search"
         onChangeText={text => onChangeText(text)}
+        autoFocus={focused}
+        onPressIn={onPress}
       />
     </View>
   );
@@ -26,5 +28,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     margin: 10,
     borderRadius: 10,
+    width: '100%',
   },
 });

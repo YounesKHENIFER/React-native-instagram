@@ -33,6 +33,7 @@ export default function Profile({navigation}) {
   const {colors} = useTheme();
   const [editModal, setEditModal] = useState(false);
   const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   //   getting user posts
   function getPosts() {
@@ -46,6 +47,7 @@ export default function Profile({navigation}) {
           tmp.push({id: post.id, ...post.data()});
         });
         setPosts(tmp);
+        setLoading(false);
       })
       .catch(e => console.log('Getting Posts Error :', e.message));
   }
@@ -64,7 +66,7 @@ export default function Profile({navigation}) {
         postsLength={posts.length}
       />
 
-      <ProfileNavigation posts={posts} />
+      <ProfileNavigation posts={posts} loading={loading} />
       <EditUser
         setEditModal={setEditModal}
         editModal={editModal}
