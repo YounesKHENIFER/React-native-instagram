@@ -83,9 +83,9 @@ function SearchModal({setModal, modal, colors}) {
           items.push(user.data());
         });
         setUsers(items);
+        setLoading(false);
       })
-      .catch(e => console.log('search error:', e.message))
-      .finally(setLoading(false));
+      .catch(e => console.log('search error:', e.message));
   }
   useEffect(() => {
     const temp = setTimeout(() => {

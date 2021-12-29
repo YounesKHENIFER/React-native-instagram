@@ -42,7 +42,15 @@ const StackNav = () => {
           <>
             <Stack.Screen name="MainApp" component={TopTabs} />
             <Stack.Screen name="Story" component={Story} />
-            <Stack.Screen name="Message" component={Message} />
+            <Stack.Screen
+              name="Message"
+              options={{
+                headerShown: true,
+                headerTitleAlign: 'left',
+                title: '',
+              }}
+              component={Message}
+            />
             <Stack.Screen
               name="Notifications"
               options={{
@@ -71,7 +79,6 @@ const StackNav = () => {
               name="User"
               options={{
                 headerShown: true,
-                headerShadowVisible: false,
                 title: '',
                 headerTitleAlign: 'left',
                 headerRight: () => (

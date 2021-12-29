@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 
 import {
   NavigationContainer,
@@ -14,7 +14,6 @@ const MyTheme = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,
-    primary: 'rgb(255, 45, 85)',
     background: 'white',
     postBack: '#eee',
     inputBackground: '#eee',
@@ -25,7 +24,6 @@ const MyDarkTheme = {
   ...DarkTheme,
   colors: {
     ...DarkTheme.colors,
-    primary: 'rgb(255, 45, 85)',
     postBack: 'rgb(0, 0, 30)',
     inputBackground: '#333333',
     inputPlaceholder: '#eee',

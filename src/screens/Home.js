@@ -122,12 +122,8 @@ function Posts({navigation, colors}) {
   let [posts, setPosts] = useState();
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
-  function onResult(newposts) {
-    let myPosts = [];
-    newposts.forEach(post => {
-      myPosts.push({postId: post.id, ...post.data()});
-    });
-    setPosts(myPosts);
+  function onResult(posts) {
+    setPosts(posts.docs.map(post => ({postId: post.id, ...post.data()})));
     setLoading(false);
     setRefreshing(false);
   }

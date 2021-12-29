@@ -16,6 +16,9 @@ import Feather from 'react-native-vector-icons/Feather';
 import {useNavigation, useTheme} from '@react-navigation/native';
 import useAuth from '../context/useAuth';
 import firestore from '@react-native-firebase/firestore';
+import moment from 'moment';
+import SingleComment from './SingleComment';
+import {colors} from 'react-native-elements';
 
 export default function Post({item}) {
   const navigation = useNavigation();
@@ -23,8 +26,8 @@ export default function Post({item}) {
   const {user} = useAuth();
   const {userId, postImage, description, createdAt, postId} = item;
   const [likes, setLikes] = useState([]);
-  const [comments, setComments] = useState([]);
-  const [likedPost, setLikedPost] = useState(likes.includes(user.uid));
+  const [lastComment, setLastComment] = useState([]);
+  const [likedPost, setLikedPost] = useState();
   const [postuser, setPostUser] = useState(null);
 
   //   get post user informations
@@ -37,15 +40,21 @@ export default function Post({item}) {
         setPostUser(user.data());
       })
       .catch(e => console.log('Getting Posts Error :', e.message));
-  }, [userId]);
+
+    firestore()
+      .collection('Posts')
+      .doc(postId)
+      .collection('Comments')
+      .orderBy('createdAt', 'desc')
+      .limit(1)
+      .get()
+      .then(res => setLastComment(res?.docs[0]?.data()))
+      .catch(onErr);
+  }, []);
 
   //   post like real time listener
   function onResult(res, set) {
-    let tmp = [];
-    res.forEach(item => {
-      tmp.push(item.id);
-    });
-    set(tmp);
+    set(res.docs.map(item => item.id));
   }
 
   function onErr(e) {
@@ -59,19 +68,10 @@ export default function Post({item}) {
         .collection('Posts')
         .doc(postId)
         .collection('Likes')
-        .onSnapshot(res => onResult(res, setLikes), onErr),
-    [likedPost],
-  );
-
-  //   getting comments real time listner
-  useEffect(
-    () =>
-      firestore()
-        .collection('Posts')
-        .doc(postId)
-        .collection('Comments')
-        .orderBy('createdAt', 'desc')
-        .onSnapshot(res => onResult(res, setComments), onErr),
+        .onSnapshot(res => {
+          onResult(res, setLikes);
+          setLikedPost(likes.includes(user.uid));
+        }, onErr),
     [],
   );
 
@@ -111,7 +111,7 @@ export default function Post({item}) {
         createdAt={createdAt}
         navigateToUser={navigateToUser}
       />
-      <Comments comments={comments} />
+      <Comments lastComment={lastComment} colors={colors} />
     </View>
   );
 }
@@ -164,22 +164,21 @@ function Footer({colors, setLikedPost, postId, userId, likedPost, navigation}) {
   //   on like functionality
   function onLike() {
     if (!likedPost) {
-      setLikedPost(true);
       firestore()
         .collection('Posts')
         .doc(postId)
         .collection('Likes')
         .doc(userId)
         .set({});
+      setLikedPost(true);
     } else {
-      setLikedPost(false);
-      console.log('like removed');
       firestore()
         .collection('Posts')
         .doc(postId)
         .collection('Likes')
         .doc(userId)
         .delete();
+      setLikedPost(false);
     }
   }
 
@@ -242,10 +241,7 @@ function Description({
   navigateToUser,
 }) {
   const [nlines, setNlines] = useState(true);
-  const date =
-    new Date(createdAt._seconds * 1000).toLocaleDateString('en-US') +
-    ' ' +
-    new Date(createdAt._seconds * 1000).toLocaleTimeString();
+
   return (
     <View style={{paddingHorizontal: 10}}>
       <Text
@@ -293,19 +289,22 @@ function Description({
           color: colors.inputPlaceholder,
           fontSize: 12,
         }}>
-        {date}
+        {moment(createdAt?.toDate()).fromNow()}
       </Text>
     </View>
   );
 }
 
-function Comments({comments}) {
-  if (comments.length) {
+function Comments({lastComment, colors}) {
+  if (lastComment) {
     return (
       <View style={styles.footer}>
-        <Text>Comments:</Text>
-        <Text>{comments[0].username}</Text>
-        <Text>{comments[0].comment}</Text>
+        <Text style={{color: colors.text}}>Last Comment :</Text>
+        <SingleComment
+          userId={lastComment.userId}
+          createdAt={lastComment.createdAt}
+          comment={lastComment.comment}
+        />
       </View>
     );
   } else {

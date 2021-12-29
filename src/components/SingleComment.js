@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 
-import {Text, View, StyleSheet, Image} from 'react-native';
+import {Text, View, StyleSheet} from 'react-native';
 import {useTheme} from '@react-navigation/native';
 
 import firestore from '@react-native-firebase/firestore';
@@ -9,53 +9,37 @@ export default function SingleComment({userId, comment, createdAt}) {
   const {colors} = useTheme();
   const [user, setUser] = useState(null);
 
-  useEffect(() => {
-    firestore()
-      .collection('Users')
-      .doc(userId)
-      .get()
-      .then(user => setUser(user.data()))
-      .catch(e => console.log(e.message));
-  }, []);
+  //   useEffect(() => {
+  //     firestore()
+  //       .collection('Users')
+  //       .doc(userId)
+  //       .get()
+  //       .then(user => setUser(user.data()))
+  //       .catch(e => console.log(e.message));
+  //   }, [userId]);
 
   return (
-    <View style={[styles.row, {borderBottomColor: colors.inputPlaceholder}]}>
-      <Image source={{uri: user?.profilePicture}} style={styles.image} />
-      <View style={styles.textBox}>
-        <Text style={[styles.username, {color: colors.text}]}>
-          {user?.username}
-        </Text>
-        <Text style={[styles.comment, {color: colors.inputPlaceholder}]}>
-          {comment}
-        </Text>
-      </View>
+    <View
+      style={[styles.container, {borderBottomColor: colors.inputPlaceholder}]}>
+      <Text style={[styles.username, {color: colors.text}]}>
+        {user?.username} :
+      </Text>
+      <Text style={[styles.comment, {color: colors.inputPlaceholder}]}>
+        {comment}
+      </Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  row: {
-    flexDirection: 'row',
-    flex: 1,
-    alignItems: 'flex-start',
-    padding: 15,
-    marginVertical: 10,
-    borderBottomWidth: 0.5,
-  },
-  image: {
-    height: 50,
-    width: 50,
-    borderRadius: 50 / 2,
-    backgroundColor: '#ccc',
-    marginRight: 20,
-  },
-  textBox: {
-    width: '80%',
+  container: {
+    padding: 10,
+    borderBottomWidth: 0.4,
   },
   username: {
-    fontSize: 16,
+    fontSize: 14,
   },
   comment: {
-    fontSize: 14,
+    fontSize: 12,
   },
 });

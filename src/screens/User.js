@@ -15,11 +15,7 @@ export default function User({navigation, route}) {
   const [loading, setLoading] = useState(true);
   // set the screen title as user's username and check if user is the logged.in user
   useEffect(() => {
-    if (route.params.userId === user.uid) {
-      navigation.navigate('Profile');
-    } else {
-      navigation.setOptions({headerTitle: route.params.username});
-    }
+    navigation.setOptions({headerTitle: route.params.username});
   }, []);
 
   //   getting user information and his posts

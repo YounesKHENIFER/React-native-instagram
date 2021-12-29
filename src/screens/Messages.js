@@ -10,6 +10,7 @@ import {
   FlatList,
   ActivityIndicator,
 } from 'react-native';
+
 import firestore from '@react-native-firebase/firestore';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import {useNavigation, useTheme} from '@react-navigation/native';
@@ -19,6 +20,8 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import Feather from 'react-native-vector-icons/Feather';
 import EmptyList from '../components/EmptyList';
 import useAuth from '../context/useAuth';
+import moment from 'moment';
+
 const Tab = createMaterialTopTabNavigator();
 
 export default function Messages({navigation}) {
@@ -104,29 +107,24 @@ function Chats() {
         .where('Participants', 'array-contains', user.uid)
         .get()
         .then(res => {
-          let items = [];
-          res.forEach(message => {
-            items.push(message.data());
-          });
-          setMessages(items);
+          setMessages(
+            res.docs.map(message => ({id: message.id, ...message.data()})),
+          );
           setLoading(false);
         })
         .catch(e => {
-          console.log('search error:', e.message);
+          console.log('getting messages:', e.message);
           setLoading(false);
         });
     }
   }
-
   const onRefresh = () => {
     setRefreshing(true);
     getMessages();
     setRefreshing(false);
   };
 
-  useEffect(() => {
-    getMessages();
-  }, []);
+  useEffect(() => getMessages(), []);
 
   return (
     <>
@@ -158,6 +156,7 @@ function Chats() {
               profilePicture={item.profilePicture}
               colors={colors}
               senderID={item.Participants.filter(id => id !== user.uid)}
+              roomId={item.id}
             />
           )}
           ListEmptyComponent={<EmptyList item="Messages" />}
@@ -167,25 +166,54 @@ function Chats() {
   );
 }
 
-function Message({colors, senderID}) {
+function Message({colors, senderID, roomId}) {
   const navigation = useNavigation();
   const [sender, setSender] = useState();
+  const [lastMessage, setLastMessage] = useState('');
+
+  function getSender() {
+    firestore()
+      .collection('Users')
+      .doc(senderID.toString())
+      .get()
+      .then(res => setSender(res.data()))
+      .catch(e => console.log('getting sender :', e.message));
+  }
+  function getLastMessage() {
+    firestore()
+      .collection('Messages')
+      .doc(roomId)
+      .collection('messages')
+      .orderBy('createdAt', 'desc')
+      .limit(1)
+      .onSnapshot(
+        res => {
+          res.forEach(msg => {
+            setLastMessage({msgId: msg.id, ...msg.data()});
+          });
+        },
+        e => console.log('getting sender :', e.message),
+      );
+  }
   useEffect(() => {
-    if (senderID)
-      firestore()
-        .collection('Users')
-        .doc(senderID.toString())
-        .get()
-        .then(res => setSender(res.data()))
-        .catch(e => console.log('getting sender :', e.message));
+    if (senderID) {
+      getSender();
+    }
   }, []);
+  useEffect(() => getLastMessage(), []);
   return (
     <View style={styles.messageBox}>
       {/* left section */}
       <TouchableOpacity
         style={{...styles.row, flex: 1}}
         activeOpacity={0.7}
-        onPress={() => navigation.push('Message', {senderID: senderID})}>
+        onPress={() =>
+          navigation.push('Message', {
+            senderUsername: sender?.username,
+            senderID: senderID,
+            roomId: roomId,
+          })
+        }>
         <View style={styles.circle}>
           <Image
             style={[styles.image, {borderColor: colors.text}]}
@@ -196,8 +224,13 @@ function Message({colors, senderID}) {
           <Text style={[styles.name, {color: colors.text}]}>
             {sender?.username}
           </Text>
-          <Text numberOfLines={1} style={{color: 'gray', fontSize: 12}}>
-            lastMessage
+
+          <Text numberOfLines={1} style={{color: 'gray', fontSize: 13}}>
+            {lastMessage.message}
+          </Text>
+
+          <Text numberOfLines={1} style={{color: 'gray', fontSize: 10}}>
+            {moment(lastMessage?.createdAt?.toDate()).fromNow()}
           </Text>
         </View>
       </TouchableOpacity>

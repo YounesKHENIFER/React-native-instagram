@@ -19,23 +19,23 @@ import SingleComment from '../components/SingleComment';
 import EmptyList from '../components/EmptyList';
 import firestore from '@react-native-firebase/firestore';
 import useAuth from '../context/useAuth';
+import {ScrollView} from 'react-native';
 
 export default function Comment({navigation, route}) {
   const {colors} = useTheme();
   const {user} = useAuth();
-  const flatListRef = useRef();
+  const scrollRef = useRef();
   const [comment, setComment] = useState('');
   const [comments, setComments] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   function onComResult(res) {
-    let tmp = [];
-    res.forEach(com => {
-      tmp.push({commentId: com.id, ...com.data()});
-    });
-    setComments(tmp);
+    setComments(res.docs.map(item => ({commentId: item.id, ...item.data()})));
+    setLoading(false);
   }
   function onErr(e) {
     console.log(e.message);
+    setLoading(false);
   }
   useEffect(
     () =>
@@ -62,30 +62,45 @@ export default function Comment({navigation, route}) {
         .then(() => {})
         .catch(e => console.log(e.message));
 
-      flatListRef.current.scrollToEnd({animating: true});
       setComment('');
     }
   }
   return (
     <View style={[styles.container, {backgroundColor: colors.background}]}>
       <View style={{flex: 1}}>
-        <FlatList
-          ref={flatListRef}
-          data={comments}
-          keyExtractor={(item, i) => i.toString()}
-          renderItem={({item}) => (
-            <SingleComment
-              comment={item.comment}
-              userId={item.userId}
-              createdAt={item.createdAt}
-            />
-          )}
-          ListEmptyComponent={
-            <View style={styles.center}>
-              <EmptyList item="Comments" />
-            </View>
-          }
-        />
+        {loading ? (
+          <View
+            style={{
+              height: '100%',
+              justifyContent: 'center',
+            }}>
+            <ActivityIndicator size="large" color="gray" />
+          </View>
+        ) : (
+          <>
+            {comments.length ? (
+              <ScrollView
+                ref={scrollRef}
+                onContentSizeChange={() =>
+                  scrollRef.current.scrollToEnd({animated: true})
+                }
+                style={[{backgroundColor: colors.background}]}>
+                {comments.map((item, i) => (
+                  <SingleComment
+                    key={i.toString()}
+                    comment={item.comment}
+                    userId={item.userId}
+                    createdAt={item.createdAt}
+                  />
+                ))}
+              </ScrollView>
+            ) : (
+              <View style={styles.center}>
+                <EmptyList item="Comments" />
+              </View>
+            )}
+          </>
+        )}
       </View>
 
       <View style={styles.row}>
