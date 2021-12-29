@@ -8,17 +8,17 @@ import {
   TouchableOpacity,
   Image,
   FlatList,
+  ActivityIndicator,
 } from 'react-native';
-
+import firestore from '@react-native-firebase/firestore';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
+import {useNavigation, useTheme} from '@react-navigation/native';
 
 import SearchBox from '../components/SearchBox';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Feather from 'react-native-vector-icons/Feather';
-import {messages} from '../../dummyData';
-import {useTheme} from '@react-navigation/native';
-import {colors} from 'react-native-elements';
-
+import EmptyList from '../components/EmptyList';
+import useAuth from '../context/useAuth';
 const Tab = createMaterialTopTabNavigator();
 
 export default function Messages({navigation}) {
@@ -90,70 +90,114 @@ function Header({navigation, colors}) {
 }
 function Chats() {
   const {colors} = useTheme();
-  // search functionality
-  function handleSearch(text) {
-    console.log(text);
-  }
-  // refresh
+  const {user} = useAuth();
+  const [messages, setMessages] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const onRefresh = useCallback(() => {
+  const [searchTerm, setSearchTerm] = useState('');
+
+  function getMessages() {
+    if (user) {
+      setLoading(true);
+      firestore()
+        .collection('Messages')
+        .where('Participants', 'array-contains', user.uid)
+        .get()
+        .then(res => {
+          let items = [];
+          res.forEach(message => {
+            items.push(message.data());
+          });
+          setMessages(items);
+          setLoading(false);
+        })
+        .catch(e => {
+          console.log('search error:', e.message);
+          setLoading(false);
+        });
+    }
+  }
+
+  const onRefresh = () => {
     setRefreshing(true);
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 2000);
+    getMessages();
+    setRefreshing(false);
+  };
+
+  useEffect(() => {
+    getMessages();
   }, []);
 
   return (
-    <FlatList
-      refreshing={refreshing}
-      onRefresh={() => onRefresh()}
-      contentContainerStyle={[
-        styles.container,
-        {backgroundColor: colors.background},
-      ]}
-      data={messages}
-      keyExtractor={(item, i) => i}
-      renderItem={({item}) => (
-        <Message
-          username={item.username}
-          lastMessage={item.lastMessage}
-          profilePicture={item.profilePicture}
-          colors={colors}
+    <>
+      <SearchBox onChangeText={setSearchTerm} />
+      {loading ? (
+        <View
+          style={{
+            height: '100%',
+            justifyContent: 'center',
+          }}>
+          <ActivityIndicator size="large" color="gray" />
+        </View>
+      ) : (
+        <FlatList
+          refreshing={refreshing}
+          onRefresh={() => onRefresh()}
+          contentContainerStyle={[
+            styles.container,
+            {backgroundColor: colors.background},
+          ]}
+          data={messages}
+          keyExtractor={(item, i) =>
+            item.Participants.filter(id => id !== user.uid)
+          }
+          renderItem={({item}) => (
+            <Message
+              username={item.username}
+              lastMessage={item.lastMessage}
+              profilePicture={item.profilePicture}
+              colors={colors}
+              senderID={item.Participants.filter(id => id !== user.uid)}
+            />
+          )}
+          ListEmptyComponent={<EmptyList item="Messages" />}
         />
       )}
-      ListHeaderComponent={<SearchBox onChangeText={handleSearch} />}
-    />
+    </>
   );
 }
-function Calls() {
-  return (
-    <ScrollView style={styles.container}>
-      <Text>Calls</Text>
-    </ScrollView>
-  );
-}
-function Requests() {
-  return (
-    <ScrollView style={styles.container}>
-      <Text>Requests</Text>
-    </ScrollView>
-  );
-}
-function Message({colors, username, lastMessage, profilePicture}) {
+
+function Message({colors, senderID}) {
+  const navigation = useNavigation();
+  const [sender, setSender] = useState();
+  useEffect(() => {
+    if (senderID)
+      firestore()
+        .collection('Users')
+        .doc(senderID.toString())
+        .get()
+        .then(res => setSender(res.data()))
+        .catch(e => console.log('getting sender :', e.message));
+  }, []);
   return (
     <View style={styles.messageBox}>
       {/* left section */}
-      <TouchableOpacity style={{...styles.row, flex: 1}} activeOpacity={0.6}>
+      <TouchableOpacity
+        style={{...styles.row, flex: 1}}
+        activeOpacity={0.7}
+        onPress={() => navigation.push('Message', {senderID: senderID})}>
         <View style={styles.circle}>
           <Image
             style={[styles.image, {borderColor: colors.text}]}
-            source={{uri: profilePicture}}
+            source={{uri: sender?.profilePicture}}
           />
         </View>
         <View style={{maxWidth: 250}}>
-          <Text style={[styles.name, {color: colors.text}]}>{username}</Text>
-          <Text numberOfLines={1} style={{color: colors.text}}>
-            {lastMessage}
+          <Text style={[styles.name, {color: colors.text}]}>
+            {sender?.username}
+          </Text>
+          <Text numberOfLines={1} style={{color: 'gray', fontSize: 12}}>
+            lastMessage
           </Text>
         </View>
       </TouchableOpacity>
@@ -166,9 +210,23 @@ function Message({colors, username, lastMessage, profilePicture}) {
     </View>
   );
 }
+function Calls() {
+  return (
+    <View style={styles.container}>
+      <EmptyList item="Calls" />
+    </View>
+  );
+}
+function Requests() {
+  return (
+    <ScrollView style={styles.container}>
+      <Text>Requests</Text>
+    </ScrollView>
+  );
+}
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 0,
+    flex: 1,
   },
   header: {
     paddingHorizontal: 10,

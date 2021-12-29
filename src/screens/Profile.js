@@ -17,6 +17,7 @@ import firestore from '@react-native-firebase/firestore';
 import Feather from 'react-native-vector-icons/Feather';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+
 import {useTheme} from '@react-navigation/native';
 
 import useAuth from '../context/useAuth';
@@ -91,6 +92,12 @@ function Header({colors, navigation, user}) {
         </Text>
       </View>
       <View style={styles.row}>
+        <MaterialCommunityIcons
+          name="theme-light-dark"
+          size={25}
+          style={styles.icon}
+          color={colors.text}
+        />
         <Switch
           trackColor={{false: '#7675', true: '#ccc'}}
           thumbColor={isDark ? '#f4f3f4' : '#767577'}

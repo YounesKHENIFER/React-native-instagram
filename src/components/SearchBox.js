@@ -7,16 +7,19 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 export default function SearchBox({onChangeText, focused, onPress}) {
   const {colors} = useTheme();
   return (
-    <View style={[styles.container, {backgroundColor: colors.inputBackground}]}>
-      <Ionicons name="search-outline" size={22} color={colors.text} />
-      <TextInput
-        style={{flex: 1, color: colors.text}}
-        placeholderTextColor={colors.text}
-        placeholder="Search"
-        onChangeText={text => onChangeText(text)}
-        autoFocus={focused}
-        onPressIn={onPress}
-      />
+    <View style={{alignItems: 'center'}}>
+      <View
+        style={[styles.container, {backgroundColor: colors.inputBackground}]}>
+        <Ionicons name="search-outline" size={22} color={colors.text} />
+        <TextInput
+          style={{flex: 1, color: colors.text}}
+          placeholderTextColor={colors.text}
+          placeholder="Search"
+          onChangeText={text => onChangeText(text)}
+          autoFocus={focused}
+          onPressIn={onPress}
+        />
+      </View>
     </View>
   );
 }
@@ -28,6 +31,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     margin: 10,
     borderRadius: 10,
-    width: '100%',
   },
 });

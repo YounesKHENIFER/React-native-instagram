@@ -31,13 +31,9 @@ export default function FollowModal({setModel, Model, title, data}) {
         <FlatList
           bounces={true}
           data={data}
-          keyExtractor={(item, i) => i}
+          keyExtractor={(item, i) => item.toString()}
           renderItem={({item}) => <SmallUser uid={item} />}
-          ListEmptyComponent={
-            <View style={styles.center}>
-              <EmptyList item={title} />
-            </View>
-          }
+          ListEmptyComponent={<EmptyList item={title} />}
         />
       </View>
     </Modal>

@@ -27,17 +27,17 @@ export default function SmallUser({uid}) {
     <TouchableOpacity
       activeOpacity={0.8}
       onPress={() => {
-        navigation.push('User', {userId: uid});
+        navigation.push('User', {userId: uid, username: user.username});
       }}
       style={styles.container}>
       <View style={styles.row}>
         <Image style={styles.image} source={{uri: user?.profilePicture}} />
         <View>
-          <Text style={{fontSize: 18, color: colors.text}}>
+          <Text style={{fontSize: 15, color: colors.text}}>
             {user?.username}
           </Text>
-          <Text style={{fontSize: 14, marginTop: 2, color: 'gray'}}>
-            {user?.displayName ?? user?.username}
+          <Text style={{fontSize: 12, color: 'gray'}}>
+            {user?.displayName ? user?.displayName : user?.username}
           </Text>
         </View>
       </View>
@@ -56,11 +56,12 @@ const styles = StyleSheet.create({
   row: {
     position: 'relative',
     flexDirection: 'row',
+    alignItems: 'center',
   },
   image: {
-    height: 60,
-    width: 60,
-    borderRadius: 60 / 2,
+    height: 55,
+    width: 55,
+    borderRadius: 55 / 2,
     backgroundColor: '#eee',
     marginRight: 20,
   },

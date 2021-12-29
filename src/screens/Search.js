@@ -1,12 +1,21 @@
 import React, {useEffect, useState} from 'react';
-import {View, ActivityIndicator, Modal, StyleSheet, Text} from 'react-native';
+import {
+  View,
+  ActivityIndicator,
+  Modal,
+  StyleSheet,
+  Text,
+  FlatList,
+} from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
+import {useTheme} from '@react-navigation/native';
 
 import ThreePostsBox from '../components/ThreePostsBox';
 import SearchBox from '../components/SearchBox';
-import {useTheme} from '@react-navigation/native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import EmptyList from '../components/EmptyList';
+import SmallUser from '../components/SmallUser';
 
 export default function Search({navigation}) {
   const {colors} = useTheme();
@@ -56,7 +65,37 @@ export default function Search({navigation}) {
 }
 const Tab = createMaterialTopTabNavigator();
 
-function SearchModal({navigation, setModal, modal, colors}) {
+function SearchModal({setModal, modal, colors}) {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(false);
+  //   users search functionality
+  function searchUsers() {
+    setLoading(true);
+    firestore()
+      .collection('Users')
+      .where('username', '>=', searchTerm)
+      .where('username', '<', searchTerm + 'z')
+      .get()
+      .then(res => {
+        let items = [];
+        res.forEach(user => {
+          items.push(user.data());
+        });
+        setUsers(items);
+      })
+      .catch(e => console.log('search error:', e.message))
+      .finally(setLoading(false));
+  }
+  useEffect(() => {
+    const temp = setTimeout(() => {
+      if (searchTerm) searchUsers();
+    }, 200);
+    return () => {
+      clearTimeout(temp);
+    };
+  }, [searchTerm]);
+
   return (
     <Modal
       animationType="none"
@@ -65,6 +104,7 @@ function SearchModal({navigation, setModal, modal, colors}) {
         setModal(false);
       }}>
       <View style={[styles.container, {backgroundColor: colors.background}]}>
+        {/* header */}
         <View style={styles.header}>
           <AntDesign
             name="arrowleft"
@@ -73,7 +113,7 @@ function SearchModal({navigation, setModal, modal, colors}) {
             style={styles.icon}
             onPress={() => setModal(false)}
           />
-          <SearchBox focused={true} />
+          <SearchBox focused={true} onChangeText={setSearchTerm} />
         </View>
         <Tab.Navigator
           initialRouteName="Posts"
@@ -97,8 +137,12 @@ function SearchModal({navigation, setModal, modal, colors}) {
             tabBarScrollEnabled: true,
             swipeEnabled: true,
           }}>
-          <Tab.Screen name="Top">{() => <Accounts />}</Tab.Screen>
-          <Tab.Screen name="Accounts">{() => <Accounts />}</Tab.Screen>
+          <Tab.Screen name="Top">
+            {() => <Accounts users={users} loading={loading} />}
+          </Tab.Screen>
+          <Tab.Screen name="Accounts">
+            {() => <Accounts users={users} loading={loading} />}
+          </Tab.Screen>
           <Tab.Screen name="Audio" component={Audio} />
           <Tab.Screen name="Tags" component={Tags} />
           <Tab.Screen name="Places" component={Places} />
@@ -108,17 +152,50 @@ function SearchModal({navigation, setModal, modal, colors}) {
   );
 }
 
-function Accounts() {
-  return <Text>Test</Text>;
+function Accounts({loading, users}) {
+  return (
+    <>
+      {loading ? (
+        <View
+          style={{
+            height: '100%',
+            justifyContent: 'center',
+          }}>
+          <ActivityIndicator size="large" color="gray" />
+        </View>
+      ) : (
+        <FlatList
+          contentContainerStyle={styles.container}
+          bounces={true}
+          data={users}
+          keyExtractor={(item, i) => item.uid.toString()}
+          renderItem={({item}) => <SmallUser uid={item.uid} />}
+          ListEmptyComponent={<EmptyList item="Search Resault" />}
+        />
+      )}
+    </>
+  );
 }
 function Tags() {
-  return <Text>Test</Text>;
+  return (
+    <View style={styles.container}>
+      <EmptyList item="Tags" />
+    </View>
+  );
 }
 function Places() {
-  return <Text>Test</Text>;
+  return (
+    <View style={styles.container}>
+      <EmptyList item="Places" />
+    </View>
+  );
 }
 function Audio() {
-  return <Text>Test</Text>;
+  return (
+    <View style={styles.container}>
+      <EmptyList item="Audio" />
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({

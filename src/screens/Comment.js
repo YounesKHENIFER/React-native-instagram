@@ -72,7 +72,7 @@ export default function Comment({navigation, route}) {
         <FlatList
           ref={flatListRef}
           data={comments}
-          keyExtractor={(item, i) => i}
+          keyExtractor={(item, i) => i.toString()}
           renderItem={({item}) => (
             <SingleComment
               comment={item.comment}

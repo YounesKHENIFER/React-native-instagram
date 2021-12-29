@@ -22,6 +22,6 @@ const styles = StyleSheet.create({
   container: {
     justifyContent: 'center',
     alignItems: 'center',
-    flex: 1,
+    height: '100%',
   },
 });

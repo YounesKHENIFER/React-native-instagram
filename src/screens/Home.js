@@ -100,7 +100,7 @@ function Stories({navigation, colors}) {
         horizontal
         showsHorizontalScrollIndicator={false}
         data={stories}
-        keyExtractor={(item, i) => i}
+        keyExtractor={(item, i) => i.toString()}
         renderItem={({item}) => (
           <Story
             username={item.username}
