@@ -48,11 +48,21 @@ export default function AddPost({navigation}) {
       ) : (
         <>
           {postImage ? (
-            <Image source={{uri: postImage}} style={styles.postImage} />
+            <Image
+              source={{uri: postImage}}
+              style={[
+                styles.postImage,
+                {backgroundColor: colors.inputBackground},
+              ]}
+            />
           ) : (
-            <View style={styles.icon}>
+            <View
+              style={[
+                styles.postImage,
+                {backgroundColor: colors.inputBackground},
+              ]}>
               <Feather
-                name="camera"
+                name="image"
                 size={100}
                 color={colors.text}
                 onPress={() =>

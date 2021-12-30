@@ -19,7 +19,7 @@ export default function SingleComment({userId, comment, createdAt}) {
           setUser(user.data());
         })
         .catch(e => console.log(e.message));
-  }, []);
+  }, [userId]);
 
   return (
     <View

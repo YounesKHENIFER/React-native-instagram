@@ -13,8 +13,37 @@ import Home from '../screens/Home';
 import Profile from '../screens/Profile';
 
 import {useTheme} from '@react-navigation/native';
+import {Text, View} from 'react-native';
+
+import Feather from 'react-native-vector-icons/Feather';
 
 const Tab = createBottomTabNavigator();
+function HeaderRightShop({colors}) {
+  return (
+    <View
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        width: 70,
+        marginHorizontal: 15,
+      }}>
+      <View
+        style={{
+          padding: 2,
+          borderWidth: 2,
+          borderColor: colors.text,
+          borderRadius: 5,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        <Feather name="bookmark" size={17} color={colors.text} />
+      </View>
+
+      <Feather name="menu" size={27} color={colors.text} />
+    </View>
+  );
+}
 export default function BottomTabs({navigation, route}) {
   const {colors} = useTheme();
   React.useLayoutEffect(() => {
@@ -26,6 +55,11 @@ export default function BottomTabs({navigation, route}) {
       initialRouteName="Home"
       screenOptions={({route}) => ({
         headerShown: false,
+        headerStyle: {
+          elevation: 0,
+          shadowOpacity: 0,
+          backgroundColor: colors.background,
+        },
         tabBarShowLabel: false,
         tabBarStyle: {
           elevation: 0,
@@ -95,7 +129,19 @@ export default function BottomTabs({navigation, route}) {
       <Tab.Screen name="Home" component={Home} />
       <Tab.Screen name="Search" component={Search} />
       <Tab.Screen name="Reels" component={Reels} />
-      <Tab.Screen name="Shop" component={Shop} />
+      <Tab.Screen
+        name="Shop"
+        component={Shop}
+        options={{
+          headerShown: true,
+          headerStyle: {
+            elevation: 0,
+            shadowOpacity: 0,
+            backgroundColor: colors.background,
+          },
+          headerRight: () => <HeaderRightShop colors={colors} />,
+        }}
+      />
       <Tab.Screen name="Profile" component={Profile} />
     </Tab.Navigator>
   );

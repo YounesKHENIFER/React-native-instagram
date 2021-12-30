@@ -14,16 +14,12 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({children}) => {
   const [user, setUser] = useState(null);
-  const [noUser, setNoUser] = useState(true);
   const [initLoading, setInitLoading] = useState(true);
 
   //   first auth listener
   useEffect(() => {
     const unsubscribe = auth().onAuthStateChanged(async currentUser => {
       setUser(currentUser);
-      if (currentUser) {
-        setNoUser(false);
-      }
       setInitLoading(false);
     });
     return unsubscribe;
@@ -39,14 +35,12 @@ export const AuthProvider = ({children}) => {
         .onSnapshot(res => {
           setUser(res.data());
         }),
-    [noUser],
+    [initLoading],
   );
 
   return (
     <>
-      {initLoading ? (
-        <SplashScreen />
-      ) : (
+      {!initLoading ? (
         <AuthContext.Provider
           value={{
             user,
@@ -54,6 +48,8 @@ export const AuthProvider = ({children}) => {
           }}>
           {children}
         </AuthContext.Provider>
+      ) : (
+        <SplashScreen />
       )}
     </>
   );
