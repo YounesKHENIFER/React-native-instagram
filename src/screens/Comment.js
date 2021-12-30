@@ -50,6 +50,7 @@ export default function Comment({navigation, route}) {
 
   function handleComment() {
     if (comment) {
+      setComment('');
       firestore()
         .collection('Posts')
         .doc(route.params.postId)
@@ -61,8 +62,6 @@ export default function Comment({navigation, route}) {
         })
         .then(() => {})
         .catch(e => console.log(e.message));
-
-      setComment('');
     }
   }
   return (

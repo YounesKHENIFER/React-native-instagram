@@ -9,24 +9,29 @@ export default function SingleComment({userId, comment, createdAt}) {
   const {colors} = useTheme();
   const [user, setUser] = useState(null);
 
-  //   useEffect(() => {
-  //     firestore()
-  //       .collection('Users')
-  //       .doc(userId)
-  //       .get()
-  //       .then(user => setUser(user.data()))
-  //       .catch(e => console.log(e.message));
-  //   }, [userId]);
+  useEffect(() => {
+    if (userId)
+      firestore()
+        .collection('Users')
+        .doc(userId)
+        .get()
+        .then(user => {
+          setUser(user.data());
+        })
+        .catch(e => console.log(e.message));
+  }, []);
 
   return (
     <View
       style={[styles.container, {borderBottomColor: colors.inputPlaceholder}]}>
-      <Text style={[styles.username, {color: colors.text}]}>
-        {user?.username} :
-      </Text>
-      <Text style={[styles.comment, {color: colors.inputPlaceholder}]}>
-        {comment}
-      </Text>
+      {user ? (
+        <Text style={[styles.username, {color: colors.text}]}>
+          {user?.username} :
+          <Text style={[styles.comment, {color: 'gray'}]}> {comment}</Text>
+        </Text>
+      ) : (
+        <Text>loading...</Text>
+      )}
     </View>
   );
 }
@@ -40,6 +45,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   comment: {
-    fontSize: 12,
+    fontSize: 13,
   },
 });

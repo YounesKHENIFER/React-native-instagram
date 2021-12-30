@@ -27,7 +27,7 @@ export default function Post({item}) {
   const {userId, postImage, description, createdAt, postId} = item;
   const [likes, setLikes] = useState([]);
   const [lastComment, setLastComment] = useState([]);
-  const [likedPost, setLikedPost] = useState();
+  const [likedPost, setLikedPost] = useState(null);
   const [postuser, setPostUser] = useState(null);
 
   //   get post user informations
@@ -54,13 +54,16 @@ export default function Post({item}) {
 
   //   post like real time listener
   function onResult(res, set) {
-    set(res.docs.map(item => item.id));
+    let tmp = [];
+    res.forEach(item => tmp.push(item.id));
+    set(tmp);
+    setLikedPost(tmp.includes(user.uid));
   }
 
   function onErr(e) {
     console.log(e.message);
   }
-  //   getting likes real time listner
+  //  real time listner
 
   useEffect(
     () =>
@@ -70,7 +73,6 @@ export default function Post({item}) {
         .collection('Likes')
         .onSnapshot(res => {
           onResult(res, setLikes);
-          setLikedPost(likes.includes(user.uid));
         }, onErr),
     [],
   );
@@ -164,21 +166,21 @@ function Footer({colors, setLikedPost, postId, userId, likedPost, navigation}) {
   //   on like functionality
   function onLike() {
     if (!likedPost) {
+      setLikedPost(true);
       firestore()
         .collection('Posts')
         .doc(postId)
         .collection('Likes')
         .doc(userId)
         .set({});
-      setLikedPost(true);
     } else {
+      setLikedPost(false);
       firestore()
         .collection('Posts')
         .doc(postId)
         .collection('Likes')
         .doc(userId)
         .delete();
-      setLikedPost(false);
     }
   }
 

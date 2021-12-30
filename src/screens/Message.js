@@ -26,6 +26,7 @@ export default function Message({navigation, route}) {
   const [contact, setContact] = useState();
   const [loading, setLoading] = useState(true);
   const scrollRef = useRef();
+
   function getContact() {
     firestore()
       .collection('Users')
@@ -40,13 +41,14 @@ export default function Message({navigation, route}) {
     getContact();
     navigation.setOptions({headerTitle: route.params.senderUsername});
   }, []);
+
   useEffect(
     () =>
       firestore()
         .collection('Messages')
         .doc(route.params.roomId)
         .collection('messages')
-        .orderBy('createdAt', 'asc')
+        .orderBy('createdAt', 'desc')
         .onSnapshot(
           res => {
             setMessages(res.docs.map(msg => ({msgId: msg.id, ...msg.data()})));
@@ -56,6 +58,25 @@ export default function Message({navigation, route}) {
         ),
     [],
   );
+
+  const renderItem = (item, i) =>
+    item.sender === user.uid ? (
+      <SendedMsg
+        key={i.toString()}
+        msg={item.message}
+        createdAt={item.createdAt}
+        colors={colors}
+      />
+    ) : (
+      <RecievedMsg
+        key={i.toString()}
+        msg={item.message}
+        createdAt={item.createdAt}
+        user={contact}
+        colors={colors}
+      />
+    );
+
   return (
     <View style={{flex: 1}}>
       {loading ? (
@@ -67,65 +88,22 @@ export default function Message({navigation, route}) {
           <ActivityIndicator size="large" color="gray" />
         </View>
       ) : (
-        // <ScrollView
-        //   ref={scrollRef}
-        //   onContentSizeChange={() =>
-        //     scrollRef.current.scrollToEnd({animated: true})
-        //   }
-        //   style={[styles.container, {backgroundColor: colors.background}]}>
-        //   {messages.length ? (
-        //     <>
-        //       {messages.map((item, i) => (
-        //         <>
-        //           {item.sender === user.uid ? (
-        //             <SendedMsg
-        //               key={i.toString()}
-        //               msg={item.message}
-        //               createdAt={item.createdAt}
-        //               colors={colors}
-        //             />
-        //           ) : (
-        //             <RecievedMsg
-        //               key={i.toString()}
-        //               msg={item.message}
-        //               createdAt={item.createdAt}
-        //               user={contact}
-        //               colors={colors}
-        //             />
-        //           )}
-        //         </>
-        //       ))}
-        //     </>
-        //   ) : (
-        //     <Text>Send A msg Now</Text>
-        //   )}
-        // </ScrollView>
-        <FlatList
-          inverted
-          contentContainerStyle={[
-            styles.container,
-            {backgroundColor: colors.background},
-          ]}
-          data={messages}
-          keyExtractor={(item, i) => i.toString()}
-          renderItem={({item}) =>
-            item.sender === user.uid ? (
-              <SendedMsg
-                msg={item.message}
-                createdAt={item.createdAt}
-                colors={colors}
-              />
-            ) : (
-              <RecievedMsg
-                msg={item.message}
-                createdAt={item.createdAt}
-                user={contact}
-                colors={colors}
-              />
-            )
+        <ScrollView
+          ref={scrollRef}
+          onContentSizeChange={() =>
+            scrollRef.current.scrollToEnd({animated: true})
           }
-          ListEmptyComponent={<Text>Send A msg Now</Text>}
-        />
+          style={[styles.container, {backgroundColor: colors.background}]}>
+          {messages.length ? (
+            <>
+              {messages.map((item, i) => (
+                <>{renderItem(item, i)}</>
+              ))}
+            </>
+          ) : (
+            <Text>Send A msg Now</Text>
+          )}
+        </ScrollView>
       )}
 
       <Input colors={colors} user={user} roomId={route.params.roomId} />
@@ -151,7 +129,11 @@ function Input({colors, user, roomId}) {
     }
   }
   return (
-    <View style={[styles.input, {backgroundColor: colors.inputBackground}]}>
+    <View
+      style={[
+        styles.input,
+        {transform: [{scaleY: -1}], backgroundColor: colors.inputBackground},
+      ]}>
       <View style={[styles.row, {width: '65%'}]}>
         <View style={styles.camera}>
           <Ionicons name="camera" size={25} color="white" />
@@ -223,7 +205,10 @@ function RecievedMsg({msg, createdAt, user, colors}) {
       <View
         style={[
           styles.msg,
-          {backgroundColor: colors.inputBackground, borderTopLeftRadius: 0},
+          {
+            backgroundColor: colors.inputBackground,
+            borderTopLeftRadius: 0,
+          },
         ]}>
         <Image
           source={{uri: user?.profilePicture}}
