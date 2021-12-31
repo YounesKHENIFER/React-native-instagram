@@ -10,7 +10,7 @@ export default function SmallUser({uid}) {
   const [visitedUser, setVisitedUser] = useState();
   const navigation = useNavigation();
   //   getting visitedUser data
-  useEffect(() => {
+  function getUser() {
     firestore()
       .collection('Users')
       .doc(uid)
@@ -19,6 +19,9 @@ export default function SmallUser({uid}) {
         setVisitedUser(res.data());
       })
       .catch(e => console.log('Getting User Error :', e.message));
+  }
+  useEffect(() => {
+    getUser();
   }, []);
 
   return (
@@ -59,7 +62,7 @@ const styles = StyleSheet.create({
   container: {
     width: '100%',
     paddingLeft: 20,
-    paddingBottom: 10,
+    paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
   },

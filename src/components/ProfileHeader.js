@@ -1,5 +1,14 @@
 import React, {useState} from 'react';
-import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  Image,
+  StyleSheet,
+  Text,
+  TouchableHighlight,
+  TouchableNativeFeedback,
+  TouchableNativeFeedbackBase,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import {useNavigation, useTheme} from '@react-navigation/native';
 import {useEffect} from 'react';
 
@@ -15,7 +24,6 @@ export default function ProfileHeader({profileUser, postsLength}) {
   const [Model, setModel] = useState(false);
   const [screen, setScreen] = useState('');
 
-  const [posts, setPosts] = useState([]);
   const [following, setFollowing] = useState([]);
   const [followers, setFollowers] = useState([]);
   const [isFollowing, setIsFollowing] = useState(false);
@@ -39,21 +47,10 @@ export default function ProfileHeader({profileUser, postsLength}) {
       })
       .catch(e => console.log('Getting Following Error :', e.message));
   }
-  function getPosts() {
-    if (profileUser)
-      firestore()
-        .collection('Posts')
-        .where('userId', '==', profileUser?.uid)
-        .get()
-        .then(res => {
-          onResult(res.docs, setPosts);
-        })
-        .catch(e => console.log('Getting Posts Error :', e.message));
-  }
+
   useEffect(() => {
     getItem('Followers', setFollowers);
     getItem('Following', setFollowing);
-    getPosts();
   }, [profileUser]);
 
   //   logged user follow functionality
@@ -99,35 +96,37 @@ export default function ProfileHeader({profileUser, postsLength}) {
           source={{uri: profileUser?.profilePicture}}
         />
         <View style={styles.row}>
-          <TouchableOpacity
-            style={styles.column}
-            onPress={() => navigation.navigate('Posts')}>
-            <Text style={[styles.number, {color: colors.text}]}>
-              {postsLength}
-            </Text>
-            <Text style={{color: colors.text}}>Posts</Text>
+          <TouchableOpacity onPress={() => navigation.navigate('Posts')}>
+            <View style={styles.column}>
+              <Text style={[styles.number, {color: colors.text}]}>
+                {postsLength}
+              </Text>
+              <Text style={{color: colors.text}}>Posts</Text>
+            </View>
           </TouchableOpacity>
           <TouchableOpacity
-            style={styles.column}
             onPress={() => {
               setScreen('Followers');
               setModel(true);
             }}>
-            <Text style={[styles.number, {color: colors.text}]}>
-              {followers.length}
-            </Text>
-            <Text style={{color: colors.text}}>Followers</Text>
+            <View style={styles.column}>
+              <Text style={[styles.number, {color: colors.text}]}>
+                {followers.length}
+              </Text>
+              <Text style={{color: colors.text}}>Followers</Text>
+            </View>
           </TouchableOpacity>
           <TouchableOpacity
-            style={styles.column}
             onPress={() => {
               setScreen('Following');
               setModel(true);
             }}>
-            <Text style={[styles.number, {color: colors.text}]}>
-              {following.length}
-            </Text>
-            <Text style={{color: colors.text}}>Following</Text>
+            <View style={styles.column}>
+              <Text style={[styles.number, {color: colors.text}]}>
+                {following.length}
+              </Text>
+              <Text style={{color: colors.text}}>Following</Text>
+            </View>
           </TouchableOpacity>
         </View>
       </View>
@@ -135,19 +134,45 @@ export default function ProfileHeader({profileUser, postsLength}) {
         <Text style={{color: colors.text}}>{profileUser?.displayName}</Text>
         <Text style={{color: colors.text}}>Bio : {profileUser?.bio}</Text>
       </View>
-      {profileUser?.uid !== user?.uid && (
-        <Btn
-          title={isFollowing ? 'Unfollow' : 'Follow'}
-          btnStyle={{
-            padding: 5,
-            backgroundColor: isFollowing ? '#b71c1c' : '#217ac1',
-          }}
-          txtStyle={{
-            fontWeight: '600',
-          }}
-          onPress={() => (isFollowing ? unFollow() : Follow())}
-        />
-      )}
+      <View style={styles.row}>
+        {profileUser?.uid !== user?.uid && (
+          <>
+            <Btn
+              title={isFollowing ? 'Unfollow' : 'Follow'}
+              btnStyle={{
+                padding: 5,
+                backgroundColor: isFollowing ? '#b71c1c' : '#217ac1',
+                flex: 1,
+              }}
+              txtStyle={{
+                fontWeight: '600',
+              }}
+              onPress={() => (isFollowing ? unFollow() : Follow())}
+            />
+            {isFollowing && (
+              <Btn
+                title="Message"
+                btnStyle={{
+                  padding: 5,
+                  paddingHorizontal: 20,
+                  backgroundColor: 'gray',
+                  marginLeft: 0,
+                }}
+                txtStyle={{
+                  fontWeight: '600',
+                }}
+                onPress={() =>
+                  navigation.navigate('Message', {
+                    senderID: profileUser?.uid,
+                    senderUsername: profileUser.username,
+                  })
+                }
+              />
+            )}
+          </>
+        )}
+      </View>
+
       <FollowModal
         setModel={setModel}
         Model={Model}

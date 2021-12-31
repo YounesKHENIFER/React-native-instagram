@@ -7,7 +7,7 @@ import Feather from 'react-native-vector-icons/Feather';
 import TopTabs from './TopTabs';
 import Message from '../screens/Message';
 import Story from '../screens/Story';
-import Notifications from '../screens/Notifications';
+import Activity from '../screens/Activity';
 import Auth from '../screens/Auth';
 import AddPost from '../screens/AddPost';
 import useAuth from '../context/useAuth';
@@ -52,12 +52,11 @@ const StackNav = () => {
               component={Message}
             />
             <Stack.Screen
-              name="Notifications"
+              name="Activity"
               options={{
                 headerShown: true,
-                title: 'Activity',
               }}
-              component={Notifications}
+              component={Activity}
             />
             <Stack.Screen
               name="AddPost"

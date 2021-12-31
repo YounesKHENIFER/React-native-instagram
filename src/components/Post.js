@@ -40,16 +40,6 @@ export default function Post({item}) {
         setPostUser(user.data());
       })
       .catch(e => console.log('Getting Posts Error :', e.message));
-
-    firestore()
-      .collection('Posts')
-      .doc(postId)
-      .collection('Comments')
-      .orderBy('createdAt', 'desc')
-      .limit(1)
-      .get()
-      .then(res => setLastComment(res?.docs[0]?.data()))
-      .catch(onErr);
   }, []);
 
   //   post like real time listener
@@ -63,8 +53,7 @@ export default function Post({item}) {
   function onErr(e) {
     console.log(e.message);
   }
-  //  real time listner
-
+  //  real time listener for likes & comments
   useEffect(
     () =>
       firestore()
@@ -73,6 +62,19 @@ export default function Post({item}) {
         .collection('Likes')
         .onSnapshot(res => {
           onResult(res, setLikes);
+        }, onErr),
+    [],
+  );
+  useEffect(
+    () =>
+      firestore()
+        .collection('Posts')
+        .doc(postId)
+        .collection('Comments')
+        .orderBy('createdAt', 'desc')
+        .limit(1)
+        .onSnapshot(res => {
+          setLastComment(res?.docs[0]?.data());
         }, onErr),
     [],
   );

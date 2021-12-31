@@ -73,7 +73,7 @@ function Header({navigation, colors}) {
           name="hearto"
           size={25}
           color={colors.text}
-          onPress={() => navigation.navigate('Notifications')}
+          onPress={() => navigation.navigate('Activity')}
         />
 
         <AntDesign
@@ -123,21 +123,23 @@ function Posts({navigation, colors}) {
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
   function onResult(posts) {
-    setPosts(posts.docs.map(post => ({postId: post.id, ...post.data()})));
+    let tmp = [];
+    posts.forEach(post => tmp.push({postId: post.id, ...post.data()}));
+    setPosts(tmp);
     setLoading(false);
     setRefreshing(false);
   }
   function onError(e) {
     console.log('Getting Posts Error :', e.message);
   }
-  useEffect(
-    () =>
-      firestore()
-        .collection('Posts')
-        .orderBy('createdAt', 'desc')
-        .onSnapshot(onResult, onError),
-    [refreshing],
-  );
+  useEffect(() => {
+    firestore()
+      .collection('Posts')
+      .orderBy('createdAt', 'desc')
+      .get()
+      .then(res => onResult(res))
+      .catch(e => onError(e));
+  }, [refreshing]);
   return (
     <View>
       {loading ? (

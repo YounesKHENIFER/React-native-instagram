@@ -95,36 +95,34 @@ function Chats() {
   const {colors} = useTheme();
   const {user} = useAuth();
   const [messages, setMessages] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
-  function getMessages() {
-    if (user) {
-      setLoading(true);
-      firestore()
-        .collection('Messages')
-        .where('Participants', 'array-contains', user.uid)
-        .get()
-        .then(res => {
-          setMessages(
-            res.docs.map(message => ({id: message.id, ...message.data()})),
-          );
-          setLoading(false);
-        })
-        .catch(e => {
-          console.log('getting messages:', e.message);
-          setLoading(false);
-        });
-    }
-  }
   const onRefresh = () => {
     setRefreshing(true);
-    getMessages();
-    setRefreshing(false);
   };
 
-  useEffect(() => getMessages(), []);
+  useEffect(
+    () =>
+      firestore()
+        .collection('Messages')
+        .orderBy('lastChanged', 'desc')
+        .where('Participants', 'array-contains', user.uid)
+        .onSnapshot(
+          res => {
+            setMessages(
+              res.docs.map(message => ({id: message.id, ...message.data()})),
+            );
+            setLoading(false);
+            setRefreshing(false);
+          },
+          e => {
+            setLoading(false);
+          },
+        ),
+    [refreshing],
+  );
 
   return (
     <>

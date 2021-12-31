@@ -23,10 +23,11 @@ export default function Message({navigation, route}) {
   const {user} = useAuth();
   const {colors} = useTheme();
   const [messages, setMessages] = useState([]);
+  const [roomId, setRoomId] = useState(route.params.roomId);
   const [contact, setContact] = useState();
   const [loading, setLoading] = useState(true);
   const scrollRef = useRef();
-
+  // getting contact infos
   function getContact() {
     firestore()
       .collection('Users')
@@ -42,13 +43,31 @@ export default function Message({navigation, route}) {
     navigation.setOptions({headerTitle: route.params.senderUsername});
   }, []);
 
+  // first check if the room exists if not create one
+  function createRoom() {
+    firestore()
+      .collection('Messages')
+      .add({
+        Participants: [user.uid, route.params.senderID],
+        lastChanged: Date.now(),
+      })
+      .then(res => setRoomId(res.id))
+      .catch(e => console.log('setting new room :', e.message));
+  }
+  useEffect(() => {
+    if (!roomId) {
+      createRoom();
+    }
+  }, []);
+
+  //   real time listener msgs
   useEffect(
     () =>
       firestore()
         .collection('Messages')
-        .doc(route.params.roomId)
+        .doc(roomId)
         .collection('messages')
-        .orderBy('createdAt', 'desc')
+        .orderBy('createdAt', 'asc')
         .onSnapshot(
           res => {
             setMessages(res.docs.map(msg => ({msgId: msg.id, ...msg.data()})));
@@ -56,20 +75,20 @@ export default function Message({navigation, route}) {
           },
           e => console.log('getting sender :', e.message),
         ),
-    [],
+    [roomId],
   );
 
   const renderItem = (item, i) =>
     item.sender === user.uid ? (
       <SendedMsg
-        key={i.toString()}
+        key={item.msgId.toString() + i.toString()}
         msg={item.message}
         createdAt={item.createdAt}
         colors={colors}
       />
     ) : (
       <RecievedMsg
-        key={i.toString()}
+        key={item.msgId.toString() + i.toString()}
         msg={item.message}
         createdAt={item.createdAt}
         user={contact}
@@ -88,25 +107,30 @@ export default function Message({navigation, route}) {
           <ActivityIndicator size="large" color="gray" />
         </View>
       ) : (
-        <ScrollView
-          ref={scrollRef}
-          onContentSizeChange={() =>
-            scrollRef.current.scrollToEnd({animated: true})
-          }
-          style={[styles.container, {backgroundColor: colors.background}]}>
+        <>
           {messages.length ? (
-            <>
+            <ScrollView
+              ref={scrollRef}
+              onContentSizeChange={() =>
+                scrollRef.current.scrollToEnd({animated: true})
+              }
+              style={[
+                styles.container,
+                {backgroundColor: colors.background, flex: 1},
+              ]}>
               {messages.map((item, i) => (
                 <>{renderItem(item, i)}</>
               ))}
-            </>
+            </ScrollView>
           ) : (
-            <Text>Send A msg Now</Text>
+            <View style={styles.sendMsgBox}>
+              <Text>Say Hi to {route.params.senderUsername}</Text>
+            </View>
           )}
-        </ScrollView>
+        </>
       )}
 
-      <Input colors={colors} user={user} roomId={route.params.roomId} />
+      <Input colors={colors} user={user} roomId={roomId} />
     </View>
   );
 }
@@ -116,6 +140,7 @@ function Input({colors, user, roomId}) {
   function handleSendMsg() {
     if (message.trim()) {
       setMessage('');
+      //   sending msg
       firestore()
         .collection('Messages')
         .doc(roomId)
@@ -125,15 +150,31 @@ function Input({colors, user, roomId}) {
           createdAt: firestore.FieldValue.serverTimestamp(),
           type: 'text',
           message: message,
+        })
+        .then(res => {
+          console.log('msg sended');
+        })
+        .catch(e => {
+          console.log('sending msg  :', e.message);
+        });
+
+      // updating last msg time
+      firestore()
+        .collection('Messages')
+        .doc(roomId)
+        .update({
+          lastChanged: Date.now(),
+        })
+        .then(res => {
+          console.log('updated time');
+        })
+        .catch(e => {
+          console.log('updateing lasttime :', e.message);
         });
     }
   }
   return (
-    <View
-      style={[
-        styles.input,
-        {transform: [{scaleY: -1}], backgroundColor: colors.inputBackground},
-      ]}>
+    <View style={[styles.input, {backgroundColor: colors.inputBackground}]}>
       <View style={[styles.row, {width: '65%'}]}>
         <View style={styles.camera}>
           <Ionicons name="camera" size={25} color="white" />
@@ -284,5 +325,10 @@ const styles = StyleSheet.create({
   },
   SendedMsg: {
     alignItems: 'flex-end',
+  },
+  sendMsgBox: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    flex: 1,
   },
 });
