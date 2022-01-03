@@ -207,6 +207,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 15,
     flexDirection: 'row',
-    width: '90%',
+    width: '96%',
   },
 });

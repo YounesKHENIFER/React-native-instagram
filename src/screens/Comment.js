@@ -86,7 +86,7 @@ export default function Comment({navigation, route}) {
                 style={[{backgroundColor: colors.background}]}>
                 {comments.map((item, i) => (
                   <SingleComment
-                    key={i.toString()}
+                    key={i}
                     comment={item.comment}
                     userId={item.userId}
                     createdAt={item.createdAt}

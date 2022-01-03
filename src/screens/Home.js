@@ -100,7 +100,7 @@ function Stories({navigation, colors}) {
         horizontal
         showsHorizontalScrollIndicator={false}
         data={stories}
-        keyExtractor={(item, i) => i.toString()}
+        keyExtractor={(item, i) => i}
         renderItem={({item}) => (
           <Story
             username={item.username}
@@ -123,9 +123,7 @@ function Posts({navigation, colors}) {
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
   function onResult(posts) {
-    let tmp = [];
-    posts.forEach(post => tmp.push({postId: post.id, ...post.data()}));
-    setPosts(tmp);
+    setPosts(posts.docs.map(post => ({postId: post.id, ...post.data()})));
     setLoading(false);
     setRefreshing(false);
   }

@@ -9,12 +9,14 @@ import React, {
 import SplashScreen from '../components/SplashScreen';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
+import useToggleTheme from './useToggleTheme';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({children}) => {
   const [user, setUser] = useState(null);
-  const [initLoading, setInitLoading] = useState(true);
+  const {themeLoading} = useToggleTheme();
+  const [userLoading, setUserLoading] = useState(true);
 
   //   first auth listener
   useEffect(() => {
@@ -23,27 +25,26 @@ export const AuthProvider = ({children}) => {
       if (currentUser) {
         setUser(currentUser);
       }
-      setInitLoading(false);
+      setUserLoading(false);
     });
     return unsubscribe;
   }, []);
 
   // user data firestore listner
 
-  useEffect(
-    () =>
+  useEffect(() => {
+    if (user)
       firestore()
         .collection('Users')
-        .doc(user?.uid)
+        .doc(user.uid)
         .onSnapshot(res => {
           setUser(res.data());
-        }),
-    [initLoading],
-  );
+        });
+  }, [userLoading]);
 
   return (
     <>
-      {!initLoading ? (
+      {!themeLoading && !userLoading ? (
         <AuthContext.Provider
           value={{
             user,

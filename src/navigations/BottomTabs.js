@@ -64,6 +64,7 @@ export default function BottomTabs({navigation, route}) {
         tabBarStyle: {
           elevation: 0,
           shadowOpacity: 0,
+          borderTopWidth: 0,
           backgroundColor: colors.background,
         },
         tabBarIcon: ({focused, color, size}) => {

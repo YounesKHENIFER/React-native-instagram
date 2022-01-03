@@ -7,12 +7,12 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 export default function SearchBox({onChangeText, focused, onPress}) {
   const {colors} = useTheme();
   return (
-    <View style={{alignItems: 'center'}}>
+    <View style={{padding: 10, width: '100%'}}>
       <View
         style={[styles.container, {backgroundColor: colors.inputBackground}]}>
         <Ionicons name="search-outline" size={22} color={colors.text} />
         <TextInput
-          style={{flex: 1, color: colors.text}}
+          style={{flex: 1, color: colors.text, width: '100%'}}
           placeholderTextColor={colors.text}
           placeholder="Search"
           onChangeText={text => onChangeText(text)}
@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 20,
-    margin: 10,
     borderRadius: 10,
+    width: '100%',
   },
 });

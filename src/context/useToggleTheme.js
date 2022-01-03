@@ -13,6 +13,7 @@ const ThemeContext = createContext();
 
 export const ThemeProvider = ({children}) => {
   const [isDark, setisDark] = useState(null);
+  const [themeLoading, setThemeLoading] = useState(true);
 
   async function getTheme() {
     try {
@@ -20,6 +21,8 @@ export const ThemeProvider = ({children}) => {
       setIsDark(JSON.parse(isDark));
     } catch (e) {
       console.log(e);
+    } finally {
+      setThemeLoading(false);
     }
   }
   useEffect(() => {
@@ -40,6 +43,7 @@ export const ThemeProvider = ({children}) => {
       value={{
         isDark,
         setIsDark,
+        themeLoading,
       }}>
       {children}
     </ThemeContext.Provider>

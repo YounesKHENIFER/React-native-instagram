@@ -81,14 +81,14 @@ export default function Message({navigation, route}) {
   const renderItem = (item, i) =>
     item.sender === user.uid ? (
       <SendedMsg
-        key={item.msgId.toString() + i.toString()}
+        key={item.msgId}
         msg={item.message}
         createdAt={item.createdAt}
         colors={colors}
       />
     ) : (
       <RecievedMsg
-        key={item.msgId.toString() + i.toString()}
+        key={item.msgId}
         msg={item.message}
         createdAt={item.createdAt}
         user={contact}
@@ -118,9 +118,7 @@ export default function Message({navigation, route}) {
                 styles.container,
                 {backgroundColor: colors.background, flex: 1},
               ]}>
-              {messages.map((item, i) => (
-                <>{renderItem(item, i)}</>
-              ))}
+              {messages.map((item, i) => renderItem(item, i))}
             </ScrollView>
           ) : (
             <View style={styles.sendMsgBox}>

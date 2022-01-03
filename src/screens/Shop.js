@@ -25,7 +25,7 @@ export default function Shop() {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.container}
           data={['Shops', 'Videos', "Editors' picks", 'Collections', 'Guides']}
-          keyExtractor={({item}, i) => i.toString()}
+          keyExtractor={({item}, i) => i}
           renderItem={({item}) => (
             <Text
               style={[
@@ -41,7 +41,7 @@ export default function Shop() {
         <FlatList
           numColumns={2}
           data={data}
-          keyExtractor={({item}, i) => i.toString()}
+          keyExtractor={({item}, i) => i}
           renderItem={({item}) => (
             <View style={styles.imageBox}>
               <Image

@@ -148,9 +148,8 @@ function Header({profilePicture, username, colors, navigateToUser}) {
           </View>
         </View>
       </TouchableWithoutFeedback>
-      <TouchableOpacity>
-        <Feather name="more-vertical" size={25} color={colors.text} />
-      </TouchableOpacity>
+
+      <Feather name="more-vertical" size={25} color={colors.text} />
     </View>
   );
 }

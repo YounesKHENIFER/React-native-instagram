@@ -1,6 +1,13 @@
 import React, {useState} from 'react';
 
-import {Text, View, StyleSheet, Image, ActivityIndicator} from 'react-native';
+import {
+  Text,
+  View,
+  StyleSheet,
+  Image,
+  ActivityIndicator,
+  TouchableOpacity,
+} from 'react-native';
 import {useTheme} from '@react-navigation/native';
 
 import openGallery from '../utils/openGallery';
@@ -42,7 +49,7 @@ export default function AddPost({navigation}) {
     <View style={[styles.container, {backgroundColor: colors.background}]}>
       {/* image Select */}
       {imageLoading ? (
-        <View style={styles.icon}>
+        <View style={styles.postImage}>
           <ActivityIndicator color={colors.text} size="large" />
         </View>
       ) : (
@@ -56,26 +63,22 @@ export default function AddPost({navigation}) {
               ]}
             />
           ) : (
-            <View
+            <TouchableOpacity
+              onPress={() =>
+                openGallery(
+                  null,
+                  null,
+                  'images/posts',
+                  setImageLoading,
+                  setPostImage,
+                )
+              }
               style={[
                 styles.postImage,
                 {backgroundColor: colors.inputBackground},
               ]}>
-              <Feather
-                name="image"
-                size={100}
-                color={colors.text}
-                onPress={() =>
-                  openGallery(
-                    null,
-                    null,
-                    'images/posts',
-                    setImageLoading,
-                    setPostImage,
-                  )
-                }
-              />
-            </View>
+              <Feather name="image" size={100} color={colors.text} />
+            </TouchableOpacity>
           )}
         </>
       )}
