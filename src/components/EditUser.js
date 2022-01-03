@@ -79,14 +79,19 @@ export default function Edit({setEditModal, editModal}) {
       <View style={[styles.container, {backgroundColor: colors.background}]}>
         {/* header */}
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => setEditModal(false)}>
-            <Feather name="x" size={30} color="red" />
-          </TouchableOpacity>
-
+          <Feather
+            name="x"
+            size={30}
+            color="red"
+            onPress={() => setEditModal(false)}
+          />
           <Text style={[styles.title, {color: colors.text}]}>Edit Profile</Text>
-          <TouchableOpacity onPress={() => handleSave()}>
-            <Feather name="check" size={30} color="green" />
-          </TouchableOpacity>
+          <Feather
+            name="check"
+            size={30}
+            color="green"
+            onPress={() => handleSave()}
+          />
         </View>
         {/* body */}
         <View style={styles.imageBox}>

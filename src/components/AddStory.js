@@ -2,12 +2,15 @@ import React from 'react';
 import {StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
 
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import {useTheme} from '@react-navigation/native';
+import {useNavigation, useTheme} from '@react-navigation/native';
 
 const AddStory = ({name, picture}) => {
   const {colors} = useTheme();
+  const navigation = useNavigation();
   return (
-    <TouchableOpacity style={styles.container}>
+    <TouchableOpacity
+      style={styles.container}
+      onPress={() => navigation.navigate('Camera')}>
       <View style={styles.circle}>
         <Image
           style={[styles.image, {borderColor: colors.background}]}

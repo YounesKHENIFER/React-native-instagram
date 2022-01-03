@@ -7,6 +7,7 @@ import {useTheme} from '@react-navigation/native';
 const Story = props => {
   const {colors} = useTheme();
   const {username, profilePicture, navigation} = props;
+
   return (
     <TouchableOpacity
       onPress={() =>
