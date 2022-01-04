@@ -4,7 +4,6 @@ import {
   ActivityIndicator,
   Modal,
   StyleSheet,
-  Text,
   FlatList,
 } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
@@ -29,11 +28,7 @@ export default function Search({navigation}) {
       .orderBy('createdAt', 'desc')
       .get()
       .then(res => {
-        let myPosts = [];
-        res.forEach(post => {
-          myPosts.push({postId: post.id, ...post.data()});
-        });
-        setPosts(myPosts);
+        setPosts(res?.docs?.map(post => ({postId: post.id, ...post.data()})));
         setLoading(false);
       })
       .catch(e => console.log('Getting Posts Error :', e.message));

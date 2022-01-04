@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {View, Text, TouchableOpacity, StyleSheet, Modal} from 'react-native';
 
 import Feather from 'react-native-vector-icons/Feather';

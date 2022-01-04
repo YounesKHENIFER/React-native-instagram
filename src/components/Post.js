@@ -18,7 +18,6 @@ import useAuth from '../context/useAuth';
 import firestore from '@react-native-firebase/firestore';
 import moment from 'moment';
 import SingleComment from './SingleComment';
-import {colors} from 'react-native-elements';
 
 export default function Post({item}) {
   const navigation = useNavigation();
@@ -26,10 +25,9 @@ export default function Post({item}) {
   const {user} = useAuth();
   const {userId, postImage, description, createdAt, postId} = item;
   const [likes, setLikes] = useState([]);
-  const [lastComment, setLastComment] = useState([]);
+  const [lastComment, setLastComment] = useState(null);
   const [likedPost, setLikedPost] = useState(null);
   const [postuser, setPostUser] = useState(null);
-
   //   get post user informations
   useEffect(() => {
     firestore()
@@ -63,6 +61,7 @@ export default function Post({item}) {
         .onSnapshot(res => {
           onResult(res, setLikes);
         }, onErr),
+
     [],
   );
   useEffect(
@@ -76,6 +75,7 @@ export default function Post({item}) {
         .onSnapshot(res => {
           setLastComment(res?.docs[0]?.data());
         }, onErr),
+
     [],
   );
 
@@ -266,27 +266,32 @@ function Description({
           {username}
         </Text>
       </TouchableWithoutFeedback>
-      <Text
-        style={{
-          color: colors.text,
-        }}
-        numberOfLines={nlines ? 3 : null}>
-        {description}
-      </Text>
-      {description.length > 150 && (
-        <TouchableOpacity
-          style={{height: 30, justifyContent: 'center'}}
-          onPress={() => setNlines(!nlines)}>
+      {description ? (
+        <>
           <Text
             style={{
-              fontWeight: '500',
-              fontSize: 14,
               color: colors.text,
-            }}>
-            See {nlines ? 'More' : 'Less'}
+            }}
+            numberOfLines={nlines ? 3 : null}>
+            {description}
           </Text>
-        </TouchableOpacity>
-      )}
+          {description.length > 150 && (
+            <TouchableOpacity
+              style={{height: 30, justifyContent: 'center'}}
+              onPress={() => setNlines(!nlines)}>
+              <Text
+                style={{
+                  fontWeight: '500',
+                  fontSize: 14,
+                  color: colors.text,
+                }}>
+                See {nlines ? 'More' : 'Less'}
+              </Text>
+            </TouchableOpacity>
+          )}
+        </>
+      ) : null}
+
       <Text
         style={{
           color: colors.inputPlaceholder,

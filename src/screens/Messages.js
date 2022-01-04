@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useCallback} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import {
   ScrollView,
@@ -168,7 +168,7 @@ function Message({colors, senderID, roomId}) {
   const navigation = useNavigation();
   const [sender, setSender] = useState();
   const [lastMessage, setLastMessage] = useState('');
-
+  // geeting sender infos
   function getSender() {
     firestore()
       .collection('Users')
@@ -177,6 +177,7 @@ function Message({colors, senderID, roomId}) {
       .then(res => setSender(res.data()))
       .catch(e => console.log('getting sender :', e.message));
   }
+  //   getting last message
   function getLastMessage() {
     firestore()
       .collection('Messages')
@@ -185,11 +186,7 @@ function Message({colors, senderID, roomId}) {
       .orderBy('createdAt', 'desc')
       .limit(1)
       .onSnapshot(
-        res => {
-          res.forEach(msg => {
-            setLastMessage({msgId: msg.id, ...msg.data()});
-          });
-        },
+        res => setLastMessage(res?.docs[0].data()),
         e => console.log('getting sender :', e.message),
       );
   }

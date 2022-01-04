@@ -8,18 +8,17 @@ import firestore from '@react-native-firebase/firestore';
 export default function SingleComment({userId, comment, createdAt}) {
   const {colors} = useTheme();
   const [user, setUser] = useState(null);
-
+  // getting user infos
   useEffect(() => {
-    if (userId)
-      firestore()
-        .collection('Users')
-        .doc(userId)
-        .get()
-        .then(user => {
-          setUser(user.data());
-        })
-        .catch(e => console.log(e.message));
-  }, [userId]);
+    firestore()
+      .collection('Users')
+      .doc(userId)
+      .get()
+      .then(user => {
+        setUser(user.data());
+      })
+      .catch(e => console.log(e.message));
+  }, []);
 
   return (
     <View

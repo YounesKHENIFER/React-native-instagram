@@ -11,6 +11,7 @@ export default function EmptyList({item}) {
           fontSize: 18,
           fontWeight: '500',
           color: colors.text,
+          textAlign: 'center',
         }}>
         There Is No {item}
       </Text>
@@ -23,5 +24,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     height: '100%',
+    zIndex: 20,
   },
 });

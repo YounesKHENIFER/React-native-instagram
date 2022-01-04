@@ -4,16 +4,16 @@ import firestore from '@react-native-firebase/firestore';
 import Post from '../components/Post';
 import {ActivityIndicator, View} from 'react-native';
 
-export default function SinglePost({navigation, route}) {
+export default function SinglePost({route}) {
   const [post, setPost] = useState();
-
+  // getting post data
   useEffect(() => {
     firestore()
       .collection('Posts')
       .doc(route.params.postId)
       .get()
       .then(res => {
-        setPost(res.data());
+        setPost({postId: res.id, ...res.data()});
       })
       .catch(e => console.log('Getting Posts Error :', e.message));
   }, [route.params.postId]);

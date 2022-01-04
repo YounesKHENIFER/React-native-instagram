@@ -12,22 +12,21 @@ import {
 import Story from '../components/Story';
 import AddStory from '../components/AddStory';
 import Post from '../components/Post';
-import useAuth from '../context/useAuth';
-import {stories} from '../../dummyData';
-
-import AntDesign from 'react-native-vector-icons/AntDesign';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import useToggleTheme from '../context/useToggleTheme';
 import AddBox from '../components/AddBox';
 import Separator from '../components/Separator';
 import EmptyList from '../components/EmptyList';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import useAuth from '../context/useAuth';
 
+import useToggleTheme from '../context/useToggleTheme';
 import firestore from '@react-native-firebase/firestore';
 
 const Home = ({navigation}) => {
   const {user} = useAuth();
   const {colors} = useTheme();
   const [following, setFollowing] = useState([]);
+  //   getting user's following
   useEffect(() => {
     firestore()
       .collection('Users')
@@ -63,11 +62,11 @@ function Header({navigation, colors}) {
   return (
     <View style={styles.header}>
       <Image
-        style={isDark ? styles.logoD : styles.logoW}
+        style={styles.logoW}
         source={
           isDark
             ? require('../assets/text-logo-white.png')
-            : require('../assets/text-logo.png')
+            : require('../assets/text-logo-black.png')
         }
       />
       <View style={{flexDirection: 'row'}}>
@@ -101,7 +100,7 @@ function Header({navigation, colors}) {
 
 function Stories({following, profilePicture}) {
   const [stories, setStories] = useState([]);
-  //   getting stories
+  //   getting stories for following and user it self only
   useEffect(() => {
     if (following.length)
       firestore()
@@ -137,25 +136,27 @@ function Posts({navigation, colors, following, profilePicture}) {
   let [posts, setPosts] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (following.length)
-      return firestore()
+  const [limit, setLimit] = useState(5);
+  //   getting posts
+  useEffect(
+    () =>
+      firestore()
         .collection('Posts')
+        .limit(limit)
         .where('userId', 'in', following)
+        .orderBy('createdAt', 'desc')
         .onSnapshot(
           posts => {
             setPosts(
-              posts.docs
-                .map(post => ({postId: post.id, ...post.data()}))
-                .sort((a, b) => b.createdAt - a.createdAt),
+              posts.docs.map(post => ({postId: post.id, ...post.data()})),
             );
             setLoading(false);
             setRefreshing(false);
           },
-          e => console.log('Getting Posts Error :', e.message),
-        );
-  }, [refreshing, following]);
+          e => setLoading(false),
+        ),
+    [refreshing, following, limit],
+  );
   return (
     <View>
       {loading ? (
@@ -169,14 +170,16 @@ function Posts({navigation, colors, following, profilePicture}) {
       ) : (
         <FlatList
           refreshing={refreshing}
+          contentContainerStyle={{flex: 1}}
           onRefresh={() => setRefreshing(true)}
+          onEndReached={() => setLimit(limit + 5)}
           bounces={true}
           data={posts}
           keyExtractor={(item, i) => item.postId}
           renderItem={({item}) => <Post item={item} />}
           ListEmptyComponent={
-            <View style={styles.center}>
-              <EmptyList item="Posts" />
+            <View style={[styles.center, {flex: 1}]}>
+              <EmptyList item="Posts Start Following Users To Get Posts" />
             </View>
           }
           ListHeaderComponent={
@@ -207,12 +210,14 @@ const styles = StyleSheet.create({
     height: 60,
   },
   logoW: {
-    height: 50,
-    width: 150,
+    resizeMode: 'contain',
+    height: 40,
+    width: 120,
   },
   logoD: {
-    height: 40,
-    width: 160,
+    resizeMode: 'contain',
+    height: 30,
+    width: 120,
   },
   btn: {
     marginHorizontal: 15,

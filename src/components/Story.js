@@ -9,6 +9,7 @@ const Story = ({userId}) => {
   const {colors} = useTheme();
   const navigation = useNavigation();
   const [user, setUser] = useState();
+  //getting user infos
   useEffect(() => {
     firestore()
       .collection('Users')
@@ -64,6 +65,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   image: {
+    backgroundColor: '#ccc',
     height: 64,
     width: 64,
     borderRadius: 32,

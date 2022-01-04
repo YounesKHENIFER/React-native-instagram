@@ -1,11 +1,14 @@
 import React, {useEffect, useState} from 'react';
 import {Image, StyleSheet, Text, TextInput, View} from 'react-native';
 import firestore from '@react-native-firebase/firestore';
+
 import Feather from 'react-native-vector-icons/Feather';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 
 export default function Story({navigation, route}) {
   const {user} = route.params;
   const [story, setStory] = useState(null);
+  //   getting story data
   useEffect(() => {
     firestore()
       .collection('Stories')
@@ -22,6 +25,12 @@ export default function Story({navigation, route}) {
       <View style={styles.row}>
         {/* user info */}
         <View style={styles.userBox}>
+          <AntDesign
+            name="arrowleft"
+            size={27}
+            color="white"
+            onPress={() => navigation.goBack()}
+          />
           <Image source={{uri: user.profilePicture}} style={styles.userPic} />
           <Text style={styles.user}>{user.username}</Text>
         </View>
@@ -64,7 +73,7 @@ const styles = StyleSheet.create({
     height: 30,
     width: 30,
     borderRadius: 30 / 2,
-    marginRight: 10,
+    marginHorizontal: 10,
   },
   userBox: {
     flexDirection: 'row',

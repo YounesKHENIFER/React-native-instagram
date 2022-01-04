@@ -25,11 +25,7 @@ export default function User({navigation, route}) {
       .where('userId', '==', route.params.userId)
       .get()
       .then(res => {
-        let tmp = [];
-        res.forEach(post => {
-          tmp.push({id: post.id, ...post.data()});
-        });
-        setPosts(tmp);
+        setPosts(res?.docs?.map(post => ({postId: post.id, ...post.data()})));
         setLoading(false);
       })
       .catch(e => console.log('Getting Posts Error :', e.message));

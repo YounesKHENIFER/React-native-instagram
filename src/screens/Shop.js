@@ -3,6 +3,7 @@ import React from 'react';
 import {Image} from 'react-native';
 import {View, Text, FlatList, StyleSheet, Dimensions} from 'react-native';
 import SearchBox from '../components/SearchBox';
+
 export default function Shop() {
   const {colors} = useTheme();
   //   dummy data

@@ -5,7 +5,6 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   StyleSheet,
-  Image,
   ScrollView,
   Modal,
   Switch,
@@ -54,7 +53,7 @@ export default function Profile({navigation}) {
   }, []);
   return (
     <View style={[styles.container, {backgroundColor: colors.background}]}>
-      <Header colors={colors} navigation={navigation} user={user} />
+      <Header colors={colors} user={user} />
       <Informations
         colors={colors}
         navigation={navigation}
@@ -74,7 +73,7 @@ export default function Profile({navigation}) {
   );
 }
 
-function Header({colors, navigation, user}) {
+function Header({colors, user}) {
   const {isDark, setIsDark} = useToggleTheme();
   const [modalVisible, setModelVisible] = useState(false);
   const [boxModal, setBoxModal] = useState(false);

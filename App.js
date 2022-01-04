@@ -7,7 +7,8 @@ import {LogBox} from 'react-native';
 import Index from './src/navigations';
 
 const App = () => {
-  LogBox.ignoreLogs(['AsyncStorage']);
+  // ignore this prblm because every thing is ok but still going wrong
+  LogBox.ignoreLogs(['React state update']);
   return (
     <ThemeProvider>
       <AuthProvider>

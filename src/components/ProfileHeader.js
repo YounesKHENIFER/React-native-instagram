@@ -1,14 +1,5 @@
 import React, {useState} from 'react';
-import {
-  Image,
-  StyleSheet,
-  Text,
-  TouchableHighlight,
-  TouchableNativeFeedback,
-  TouchableNativeFeedbackBase,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {useNavigation, useTheme} from '@react-navigation/native';
 import {useEffect} from 'react';
 
@@ -130,6 +121,7 @@ export default function ProfileHeader({profileUser, postsLength}) {
         <Text style={{color: colors.text}}>{profileUser?.displayName}</Text>
         <Text style={{color: colors.text}}>Bio : {profileUser?.bio}</Text>
       </View>
+
       <View style={styles.row}>
         {profileUser?.uid !== user?.uid && (
           <>
@@ -151,7 +143,7 @@ export default function ProfileHeader({profileUser, postsLength}) {
                 btnStyle={{
                   padding: 5,
                   paddingHorizontal: 20,
-                  backgroundColor: 'gray',
+                  backgroundColor: '#969696',
                   marginLeft: 0,
                 }}
                 txtStyle={{

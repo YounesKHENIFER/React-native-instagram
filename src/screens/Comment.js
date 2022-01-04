@@ -1,27 +1,16 @@
 import React, {useEffect, useRef, useState} from 'react';
 
-import {
-  Text,
-  View,
-  StyleSheet,
-  Image,
-  ActivityIndicator,
-  TouchableOpacity,
-  FlatList,
-} from 'react-native';
+import {View, StyleSheet, ActivityIndicator, ScrollView} from 'react-native';
 import {useTheme} from '@react-navigation/native';
-
-import openGallery from '../utils/openGallery';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import Input from '../components/Input';
-import Btn from '../components/Btn';
-import SingleComment from '../components/SingleComment';
-import EmptyList from '../components/EmptyList';
 import firestore from '@react-native-firebase/firestore';
-import useAuth from '../context/useAuth';
-import {ScrollView} from 'react-native';
 
-export default function Comment({navigation, route}) {
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import SingleComment from '../components/SingleComment';
+import Input from '../components/Input';
+import EmptyList from '../components/EmptyList';
+import useAuth from '../context/useAuth';
+
+export default function Comment({route}) {
   const {colors} = useTheme();
   const {user} = useAuth();
   const scrollRef = useRef();

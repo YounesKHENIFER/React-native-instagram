@@ -9,12 +9,12 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import {useTheme} from '@react-navigation/native';
+import firestore from '@react-native-firebase/firestore';
 
 import openGallery from '../utils/openGallery';
 import Feather from 'react-native-vector-icons/Feather';
 import Input from '../components/Input';
 import Btn from '../components/Btn';
-import firestore from '@react-native-firebase/firestore';
 import useAuth from '../context/useAuth';
 
 export default function AddPost({navigation}) {
@@ -30,6 +30,7 @@ export default function AddPost({navigation}) {
       setError('');
     }, 2000);
   }
+  //   add post functionality
   function handlePost() {
     if (postImage) {
       firestore()

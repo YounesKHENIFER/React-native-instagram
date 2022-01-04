@@ -51,7 +51,6 @@ export default function AddBox({setBoxModal, boxModal}) {
             </TouchableOpacity>
             <Separator />
             <TouchableOpacity
-              onPress={() => Navigate('AddPost')}
               style={[styles.textBox, {backgroundColor: colors.background}]}>
               <Text style={[styles.text, {color: colors.text}]}>Reel</Text>
               <MaterialCommunityIcons

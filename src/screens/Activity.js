@@ -1,8 +1,9 @@
 import React from 'react';
-import {View, Text, FlatList, StyleSheet, Image} from 'react-native';
+import {View, Text, StyleSheet, Image} from 'react-native';
 import {useTheme} from '@react-navigation/native';
 import Btn from '../components/Btn';
 export default function Activity() {
+  // dummydata
   const data = [
     {
       username: 'cat_lover',

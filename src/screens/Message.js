@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   ScrollView,
-  FlatList,
 } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import {useTheme} from '@react-navigation/native';
@@ -62,14 +61,14 @@ export default function Message({navigation, route}) {
       .get()
       .then(res => {
         //   if the doc does not exists in first try
-        if (!res.docs[0].exists) {
+        if (!res?.docs[0]?.exists) {
           firestore()
             .collection('Messages')
             .where('Participants', '==', [route.params.senderID, user.uid])
             .get()
             .then(res => {
               // if doc does not exists in second try we create a room
-              if (!res.docs[0].exists) {
+              if (!res?.docs[0]?.exists) {
                 createRoom();
               } else {
                 setRoomId(res.docs[0].id);

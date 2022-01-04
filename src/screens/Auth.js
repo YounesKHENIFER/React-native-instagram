@@ -24,7 +24,7 @@ export default function Auth() {
   const [password, setPassword] = useState(null);
   const [username, setUsername] = useState(null);
   const [error, setError] = useState(null);
-  const [loginLoading, setLoginLoading] = useState(false);
+  const [loginLoading, setLoading] = useState(false);
 
   // handling error function
   function Errmsg(err) {
@@ -37,12 +37,14 @@ export default function Auth() {
   // login function
 
   function handleLogin() {
-    setLoginLoading(true);
+    setLoading(true);
     if (email && password) {
       auth()
         .signInWithEmailAndPassword(email, password)
-        .then(userCredential => {})
+        .then(() => setLoading(false))
         .catch(error => {
+          setLoading(false);
+
           if (
             error.code === 'auth/wrong-password' ||
             error.code === 'auth/user-not-found'
@@ -57,12 +59,12 @@ export default function Auth() {
     } else {
       Errmsg('Please Enter Your Credentials');
     }
-    setLoginLoading(false);
   }
 
   // register function
   function handleCreate() {
     if (email && password && username) {
+      setLoading(true);
       auth()
         .createUserWithEmailAndPassword(email, password)
         .then(userCredential => {
@@ -76,12 +78,13 @@ export default function Auth() {
               profilePicture:
                 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png',
             })
-            .then(() => console.log('user added'))
-            .catch(error => {
+            .then(() => setLoading(false))
+            .catch(() => {
               Errmsg('There Is A Probleme Try Again');
             });
         })
         .catch(error => {
+          setLoading(false);
           if (error.code === 'auth/email-already-in-use') {
             Errmsg('Use An Unique Personal Email');
           } else if (error.code === 'auth/weak-password') {
@@ -99,10 +102,7 @@ export default function Auth() {
     <View style={[styles.container, {backgroundColor: colors.background}]}>
       <View>
         <View style={styles.imageBox}>
-          <Image
-            style={styles.image}
-            source={require('../assets/Instagram-logo-transparent-PNG.png')}
-          />
+          <Image style={styles.image} source={require('../assets/logo.png')} />
         </View>
         {screen === 'register' && (
           <Input
@@ -154,7 +154,7 @@ export default function Auth() {
         ) : (
           <View style={styles.saving}>
             <ActivityIndicator color="#ccc" size="large" />
-            <Text>Login...</Text>
+            <Text>Loading...</Text>
           </View>
         )}
 

@@ -33,7 +33,6 @@ export default function Camera({navigation}) {
 
   //   capture functionality
   async function handleTakePicture() {
-    setDisabled(true);
     setLoading(true);
     const data = await takePicture();
     setUri(data.uri);
@@ -88,14 +87,12 @@ export default function Camera({navigation}) {
       </RNCamera>
       {/* footer */}
       <View style={styles.footer}>
-        <TouchableOpacity
-          onPress={useGallery}
-          style={styles.imagesBox}></TouchableOpacity>
+        <Ionicons onPress={useGallery} name="image" size={40} color="white" />
         <Text style={styles.text}>Story</Text>
         <Ionicons
           name="camera-reverse"
           color="white"
-          size={30}
+          size={40}
           onPress={() => setCT(!CT)}
         />
       </View>

@@ -1,9 +1,10 @@
 import React from 'react';
-import {StatusBar, Text} from 'react-native';
+import {StatusBar} from 'react-native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {useTheme} from '@react-navigation/native';
 import Feather from 'react-native-vector-icons/Feather';
 
+import useToggleTheme from '../context/useToggleTheme';
 import TopTabs from './TopTabs';
 import Message from '../screens/Message';
 import Story from '../screens/Story';
@@ -11,7 +12,6 @@ import Activity from '../screens/Activity';
 import Auth from '../screens/Auth';
 import AddPost from '../screens/AddPost';
 import useAuth from '../context/useAuth';
-import useToggleTheme from '../context/useToggleTheme';
 import Comment from '../screens/Comment';
 import User from '../screens/User';
 import SinglePost from '../screens/SinglePost';

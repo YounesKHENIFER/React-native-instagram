@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {View, StyleSheet, Modal} from 'react-native';
 import {useTheme} from '@react-navigation/native';
 import Post from './Post';
