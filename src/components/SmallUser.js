@@ -10,7 +10,8 @@ export default function SmallUser({uid}) {
   const [visitedUser, setVisitedUser] = useState();
   const navigation = useNavigation();
   //   getting visitedUser data
-  function getUser() {
+
+  useEffect(() => {
     firestore()
       .collection('Users')
       .doc(uid)
@@ -19,9 +20,6 @@ export default function SmallUser({uid}) {
         setVisitedUser(res.data());
       })
       .catch(e => console.log('Getting User Error :', e.message));
-  }
-  useEffect(() => {
-    getUser();
   }, []);
 
   return (

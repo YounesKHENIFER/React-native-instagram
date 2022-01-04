@@ -44,7 +44,7 @@ export default function Message({navigation, route}) {
   }, []);
 
   // first check if the room exists if not create one
-  function createRoom() {
+  async function createRoom() {
     firestore()
       .collection('Messages')
       .add({
@@ -54,16 +54,44 @@ export default function Message({navigation, route}) {
       .then(res => setRoomId(res.id))
       .catch(e => console.log('setting new room :', e.message));
   }
+  // check for room existens
+  function checker() {
+    firestore()
+      .collection('Messages')
+      .where('Participants', '==', [user.uid, route.params.senderID])
+      .get()
+      .then(res => {
+        //   if the doc does not exists in first try
+        if (!res.docs[0].exists) {
+          firestore()
+            .collection('Messages')
+            .where('Participants', '==', [route.params.senderID, user.uid])
+            .get()
+            .then(res => {
+              // if doc does not exists in second try we create a room
+              if (!res.docs[0].exists) {
+                createRoom();
+              } else {
+                setRoomId(res.docs[0].id);
+              }
+            })
+            .catch(e => console.log('second check test :', e.message));
+        } else {
+          setRoomId(res.docs[0].id);
+        }
+      })
+      .catch(e => console.log('first check test :', e.message));
+  }
   useEffect(() => {
     if (!roomId) {
-      createRoom();
+      checker();
     }
   }, []);
 
   //   real time listener msgs
-  useEffect(
-    () =>
-      firestore()
+  useEffect(() => {
+    if (roomId)
+      return firestore()
         .collection('Messages')
         .doc(roomId)
         .collection('messages')
@@ -74,9 +102,8 @@ export default function Message({navigation, route}) {
             setLoading(false);
           },
           e => console.log('getting sender :', e.message),
-        ),
-    [roomId],
-  );
+        );
+  }, [roomId]);
 
   const renderItem = (item, i) =>
     item.sender === user.uid ? (
@@ -149,9 +176,7 @@ function Input({colors, user, roomId}) {
           type: 'text',
           message: message,
         })
-        .then(res => {
-          console.log('msg sended');
-        })
+        .then(res => {})
         .catch(e => {
           console.log('sending msg  :', e.message);
         });
@@ -163,9 +188,7 @@ function Input({colors, user, roomId}) {
         .update({
           lastChanged: Date.now(),
         })
-        .then(res => {
-          console.log('updated time');
-        })
+        .then(res => {})
         .catch(e => {
           console.log('updateing lasttime :', e.message);
         });
@@ -227,7 +250,7 @@ function SendedMsg({msg, createdAt, colors}) {
       <View
         style={[
           styles.msg,
-          {backgroundColor: colors.inputBackground, borderTopRightRadius: 0},
+          {backgroundColor: colors.inputBackground, borderBottomRightRadius: 0},
         ]}>
         <Text style={[styles.text, {color: colors.text}]}>{msg}</Text>
         <Text numberOfLines={1} style={styles.moment}>

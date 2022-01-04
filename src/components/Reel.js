@@ -30,7 +30,7 @@ const Reel = ({item}) => {
               alignItems: 'center',
               width: 60,
             }}>
-            <Feather name="camera" size={27} color="white" />
+            <Feather name="camera" size={25} color="white" />
             <Feather name="menu" size={27} color="white" />
           </View>
         </View>

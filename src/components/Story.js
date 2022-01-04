@@ -1,18 +1,30 @@
-import React from 'react';
-
+import React, {useState, useEffect} from 'react';
 import {StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
-import LinearGradient from 'react-native-linear-gradient';
-import {useTheme} from '@react-navigation/native';
 
-const Story = props => {
+import LinearGradient from 'react-native-linear-gradient';
+import {useNavigation, useTheme} from '@react-navigation/native';
+import firestore from '@react-native-firebase/firestore';
+
+const Story = ({userId}) => {
   const {colors} = useTheme();
-  const {username, profilePicture, navigation} = props;
+  const navigation = useNavigation();
+  const [user, setUser] = useState();
+  useEffect(() => {
+    firestore()
+      .collection('Users')
+      .doc(userId)
+      .get()
+      .then(res => {
+        setUser(res.data());
+      })
+      .catch(e => console.log('Getting User Error :', e.message));
+  }, []);
 
   return (
     <TouchableOpacity
       onPress={() =>
         navigation.push('Story', {
-          props: props,
+          user: user,
         })
       }
       style={styles.container}
@@ -23,7 +35,7 @@ const Story = props => {
         end={{x: 1.0, y: 1.0}}
         style={styles.circle}>
         <Image
-          source={{uri: profilePicture}}
+          source={{uri: user?.profilePicture}}
           style={[styles.image, {borderColor: colors.background}]}
         />
       </LinearGradient>
@@ -33,7 +45,7 @@ const Story = props => {
           style={[styles.name, {color: colors.text}]}
           circle
           numberOfLines={1}>
-          {username}
+          {user?.username}
         </Text>
       </View>
     </TouchableOpacity>

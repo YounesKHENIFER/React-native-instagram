@@ -13,7 +13,7 @@ export default function SmallPost({post}) {
         style={styles.container}
         onLongPress={() => setModal(true)}
         onPressOut={() => setModal(false)}
-        onPress={() => navigation.push('SinglePost', {postId: post.id})}>
+        onPress={() => navigation.push('SinglePost', {postId: post.postId})}>
         <Image style={styles.image} source={{uri: post.postImage}} />
       </TouchableOpacity>
       <PostModal post={post} modal={modal} setModal={setModal} />

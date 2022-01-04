@@ -8,7 +8,7 @@ const ThreePostsBox = ({data, forItem}) => {
     <FlatList
       contentContainerStyle={{flex: 1}}
       data={data}
-      keyExtractor={(item, i) => i}
+      keyExtractor={(item, i) => item.postId}
       renderItem={({item}) => <SmallPost post={item} />}
       numColumns={3}
       ListEmptyComponent={<EmptyList item={forItem} />}

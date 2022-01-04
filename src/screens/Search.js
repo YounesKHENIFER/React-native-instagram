@@ -78,11 +78,7 @@ function SearchModal({setModal, modal, colors}) {
       .where('username', '<', searchTerm + 'z')
       .get()
       .then(res => {
-        let items = [];
-        res.forEach(user => {
-          items.push(user.data());
-        });
-        setUsers(items);
+        setUsers(res.docs.map(user => user.data()));
         setLoading(false);
       })
       .catch(e => console.log('search error:', e.message));

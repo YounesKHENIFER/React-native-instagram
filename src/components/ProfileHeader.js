@@ -29,11 +29,7 @@ export default function ProfileHeader({profileUser, postsLength}) {
   const [isFollowing, setIsFollowing] = useState(false);
 
   function onResult(res, set) {
-    let tmp = [];
-    res.forEach(item => {
-      tmp.push(item.id);
-    });
-    set(tmp);
+    set(res.map(doc => doc.id));
   }
   // getting followers & following & posts
   function getItem(item, setItem) {

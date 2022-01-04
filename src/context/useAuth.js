@@ -21,26 +21,33 @@ export const AuthProvider = ({children}) => {
   //   first auth listener
   useEffect(() => {
     const unsubscribe = auth().onAuthStateChanged(async currentUser => {
-      setUser(currentUser);
+      setUser(user);
       if (currentUser) {
-        setUser(currentUser);
+        firestore()
+          .collection('Users')
+          .doc(currentUser.uid)
+          .onSnapshot(res => {
+            setUser(res.data());
+            setUserLoading(false);
+          });
+      } else {
+        setUserLoading(false);
       }
-      setUserLoading(false);
     });
     return unsubscribe;
   }, []);
 
   // user data firestore listner
 
-  useEffect(() => {
-    if (user)
-      firestore()
-        .collection('Users')
-        .doc(user.uid)
-        .onSnapshot(res => {
-          setUser(res.data());
-        });
-  }, [userLoading]);
+  //   useEffect(() => {
+  //     if (!userLoading && user)
+  //       firestore()
+  //         .collection('Users')
+  //         .doc(user.uid)
+  //         .onSnapshot(res => {
+  //           setUser(res.data());
+  //         });
+  //   }, [userLoading]);
 
   return (
     <>

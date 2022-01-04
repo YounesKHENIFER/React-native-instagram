@@ -6,6 +6,7 @@ import {ActivityIndicator, View} from 'react-native';
 
 export default function SinglePost({navigation, route}) {
   const [post, setPost] = useState();
+
   useEffect(() => {
     firestore()
       .collection('Posts')

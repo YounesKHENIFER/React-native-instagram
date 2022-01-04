@@ -25,14 +25,19 @@ import EmptyList from '../components/EmptyList';
 import firestore from '@react-native-firebase/firestore';
 
 const Home = ({navigation}) => {
+  const {user} = useAuth();
   const {colors} = useTheme();
-  const [refreshing, setRefreshing] = useState(false);
-
-  const onRefresh = React.useCallback(() => {
-    setRefreshing(true);
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 2000);
+  const [following, setFollowing] = useState([]);
+  useEffect(() => {
+    firestore()
+      .collection('Users')
+      .doc(user.uid)
+      .collection('Following')
+      .get()
+      .then(res => {
+        setFollowing(res.docs.map(doc => doc.id));
+      })
+      .catch(e => console.log('Getting Following Error :', e.message));
   }, []);
   return (
     <View
@@ -42,7 +47,12 @@ const Home = ({navigation}) => {
       ]}>
       <Header navigation={navigation} colors={colors} />
       {/* posts */}
-      <Posts navigation={navigation} colors={colors} />
+      <Posts
+        navigation={navigation}
+        colors={colors}
+        following={[...following, user.uid]}
+        profilePicture={user.profilePicture}
+      />
     </View>
   );
 };
@@ -89,8 +99,20 @@ function Header({navigation, colors}) {
   );
 }
 
-function Stories({navigation, colors}) {
-  const {user} = useAuth();
+function Stories({following, profilePicture}) {
+  const [stories, setStories] = useState([]);
+  //   getting stories
+  useEffect(() => {
+    if (following.length)
+      firestore()
+        .collection('Stories')
+        .where('userId', 'in', following)
+        .get()
+        .then(res => {
+          setStories(res.docs.map(doc => doc.id));
+        })
+        .catch(e => console.log('Getting story Error :', e.message));
+  }, [following]);
 
   return (
     <View>
@@ -101,16 +123,9 @@ function Stories({navigation, colors}) {
         showsHorizontalScrollIndicator={false}
         data={stories}
         keyExtractor={(item, i) => i}
-        renderItem={({item}) => (
-          <Story
-            username={item.username}
-            profilePicture={item.profilePicture}
-            storie={item.storie}
-            navigation={navigation}
-          />
-        )}
+        renderItem={({item}) => <Story userId={item} />}
         ListHeaderComponent={
-          <AddStory name="Your Story" picture={user.profilePicture} />
+          <AddStory name="Your Story" picture={profilePicture} />
         }
       />
       <Separator height={0.3} />
@@ -118,26 +133,29 @@ function Stories({navigation, colors}) {
   );
 }
 
-function Posts({navigation, colors}) {
-  let [posts, setPosts] = useState();
+function Posts({navigation, colors, following, profilePicture}) {
+  let [posts, setPosts] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
-  function onResult(posts) {
-    setPosts(posts.docs.map(post => ({postId: post.id, ...post.data()})));
-    setLoading(false);
-    setRefreshing(false);
-  }
-  function onError(e) {
-    console.log('Getting Posts Error :', e.message);
-  }
+
   useEffect(() => {
-    firestore()
-      .collection('Posts')
-      .orderBy('createdAt', 'desc')
-      .get()
-      .then(res => onResult(res))
-      .catch(e => onError(e));
-  }, [refreshing]);
+    if (following.length)
+      return firestore()
+        .collection('Posts')
+        .where('userId', 'in', following)
+        .onSnapshot(
+          posts => {
+            setPosts(
+              posts.docs
+                .map(post => ({postId: post.id, ...post.data()}))
+                .sort((a, b) => b.createdAt - a.createdAt),
+            );
+            setLoading(false);
+            setRefreshing(false);
+          },
+          e => console.log('Getting Posts Error :', e.message),
+        );
+  }, [refreshing, following]);
   return (
     <View>
       {loading ? (
@@ -154,7 +172,7 @@ function Posts({navigation, colors}) {
           onRefresh={() => setRefreshing(true)}
           bounces={true}
           data={posts}
-          keyExtractor={(item, i) => i}
+          keyExtractor={(item, i) => item.postId}
           renderItem={({item}) => <Post item={item} />}
           ListEmptyComponent={
             <View style={styles.center}>
@@ -163,7 +181,12 @@ function Posts({navigation, colors}) {
           }
           ListHeaderComponent={
             <View>
-              <Stories colors={colors} navigation={navigation} />
+              <Stories
+                colors={colors}
+                navigation={navigation}
+                following={following}
+                profilePicture={profilePicture}
+              />
             </View>
           }
         />
