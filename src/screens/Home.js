@@ -102,7 +102,7 @@ function Stories({following, profilePicture}) {
   const [stories, setStories] = useState([]);
   //   getting stories for following and user it self only
   useEffect(() => {
-    if (following.length)
+    if (following.length) {
       firestore()
         .collection('Stories')
         .where('userId', 'in', following)
@@ -111,6 +111,7 @@ function Stories({following, profilePicture}) {
           setStories(res.docs.map(doc => doc.id));
         })
         .catch(e => console.log('Getting story Error :', e.message));
+    }
   }, [following]);
 
   return (
@@ -133,7 +134,7 @@ function Stories({following, profilePicture}) {
 }
 
 function Posts({navigation, colors, following, profilePicture}) {
-  let [posts, setPosts] = useState([]);
+  let [posts, setPosts] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [limit, setLimit] = useState(5);
@@ -144,16 +145,21 @@ function Posts({navigation, colors, following, profilePicture}) {
         .collection('Posts')
         .limit(limit)
         .where('userId', 'in', following)
-        .orderBy('createdAt', 'desc')
         .onSnapshot(
           posts => {
             setPosts(
-              posts.docs.map(post => ({postId: post.id, ...post.data()})),
+              posts.docs
+                .map(post => ({postId: post.id, ...post.data()}))
+                .sort((a, b) => b.createdAt - a.createdAt),
             );
             setLoading(false);
             setRefreshing(false);
           },
-          e => setLoading(false),
+          e => {
+            setLoading(false);
+            setRefreshing(false);
+            console.log(e.message);
+          },
         ),
     [refreshing, following, limit],
   );

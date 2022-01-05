@@ -24,18 +24,18 @@ const styles = StyleSheet.create({
     paddingBottom: 80,
   },
   image: {
-    width: 120,
-    height: 120,
-    marginBottom: 250,
+    height: 100,
+    width: 100,
+    marginBottom: 300,
   },
   text: {
     color: '#E1306d',
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: '200',
   },
   author: {
     fontWeight: '400',
-    fontSize: 15,
+    fontSize: 13,
     marginTop: 5,
   },
 });

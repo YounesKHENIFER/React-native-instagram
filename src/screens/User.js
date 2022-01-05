@@ -3,12 +3,10 @@ import {View, StyleSheet} from 'react-native';
 import {useTheme} from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
 
-import useAuth from '../context/useAuth';
 import ProfileNavigation from '../components/ProfileNavigation';
 import ProfileHeader from '../components/ProfileHeader';
 
 export default function User({navigation, route}) {
-  const {user} = useAuth();
   const {colors} = useTheme();
   const [userProfile, setUserProfile] = useState();
   const [posts, setPosts] = useState([]);

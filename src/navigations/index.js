@@ -4,7 +4,6 @@ import {
   NavigationContainer,
   DefaultTheme,
   DarkTheme,
-  useTheme,
 } from '@react-navigation/native';
 
 import StackNav from './StackNav';

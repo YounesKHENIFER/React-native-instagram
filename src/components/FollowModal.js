@@ -3,14 +3,12 @@ import {View, Text, TouchableOpacity, StyleSheet, Modal} from 'react-native';
 
 import Feather from 'react-native-vector-icons/Feather';
 
-import useAuth from '../context/useAuth';
 import {useTheme} from '@react-navigation/native';
 import {FlatList} from 'react-native';
 import SmallUser from './SmallUser';
 import EmptyList from './EmptyList';
 
 export default function FollowModal({setModel, Model, title, data}) {
-  const {user} = useAuth();
   const {colors} = useTheme();
 
   return (

@@ -89,7 +89,7 @@ export default function Message({navigation, route}) {
 
   //   real time listener msgs
   useEffect(() => {
-    if (roomId)
+    if (roomId) {
       return firestore()
         .collection('Messages')
         .doc(roomId)
@@ -102,6 +102,7 @@ export default function Message({navigation, route}) {
           },
           e => console.log('getting sender :', e.message),
         );
+    }
   }, [roomId]);
 
   const renderItem = (item, i) =>
@@ -246,15 +247,20 @@ function Input({colors, user, roomId}) {
 function SendedMsg({msg, createdAt, colors}) {
   return (
     <View style={styles.SendedMsg}>
-      <View
-        style={[
-          styles.msg,
-          {backgroundColor: colors.inputBackground, borderBottomRightRadius: 0},
-        ]}>
-        <Text style={[styles.text, {color: colors.text}]}>{msg}</Text>
+      <View style={{flexDirection: 'row'}}>
         <Text numberOfLines={1} style={styles.moment}>
           {moment(createdAt?.toDate()).fromNow()}
         </Text>
+        <View
+          style={[
+            styles.msg,
+            {
+              backgroundColor: colors.inputBackground,
+              borderBottomRightRadius: 0,
+            },
+          ]}>
+          <Text style={[styles.text, {color: colors.text}]}>{msg}</Text>
+        </View>
       </View>
     </View>
   );
@@ -263,19 +269,21 @@ function SendedMsg({msg, createdAt, colors}) {
 function RecievedMsg({msg, createdAt, user, colors}) {
   return (
     <View style={styles.RecievedMsg}>
-      <View
-        style={[
-          styles.msg,
-          {
-            backgroundColor: colors.inputBackground,
-            borderTopLeftRadius: 0,
-          },
-        ]}>
+      <View style={{flexDirection: 'row'}}>
         <Image
           source={{uri: user?.profilePicture}}
           style={styles.profilePicture}
         />
-        <Text style={[styles.text, {color: colors.text}]}>{msg}</Text>
+        <View
+          style={[
+            styles.msg,
+            {
+              backgroundColor: colors.inputBackground,
+              borderTopLeftRadius: 0,
+            },
+          ]}>
+          <Text style={[styles.text, {color: colors.text}]}>{msg}</Text>
+        </View>
         <Text numberOfLines={1} style={styles.moment}>
           {moment(createdAt?.toDate()).fromNow()}
         </Text>
@@ -313,9 +321,9 @@ const styles = StyleSheet.create({
   moment: {
     color: 'gray',
     fontSize: 10,
-    position: 'absolute',
-    bottom: 5,
-    right: 10,
+    // position: 'absolute',
+    top: 20,
+    marginHorizontal: 10,
   },
   container: {
     paddingHorizontal: 15,
@@ -324,9 +332,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     maxWidth: '70%',
-    minWidth: 120,
+    // minWidth: 120,
     padding: 10,
-    paddingBottom: 18,
     borderRadius: 20,
     borderWidth: 1,
     borderColor: '#ccc',
@@ -334,9 +341,9 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   profilePicture: {
-    height: 30,
-    width: 30,
-    borderRadius: 30 / 2,
+    height: 25,
+    width: 25,
+    borderRadius: 25 / 2,
     backgroundColor: '#eee',
     marginRight: 5,
   },

@@ -13,7 +13,7 @@ import Home from '../screens/Home';
 import Profile from '../screens/Profile';
 
 import {useTheme} from '@react-navigation/native';
-import {Text, View} from 'react-native';
+import {View} from 'react-native';
 
 import Feather from 'react-native-vector-icons/Feather';
 
@@ -32,10 +32,10 @@ function HeaderRightShop({colors}) {
         style={{
           padding: 2,
           borderWidth: 2,
-          borderColor: colors.text,
           borderRadius: 5,
           justifyContent: 'center',
           alignItems: 'center',
+          borderColor: colors.text,
         }}>
         <Feather name="bookmark" size={17} color={colors.text} />
       </View>
@@ -69,19 +69,19 @@ export default function BottomTabs({navigation, route}) {
         },
         tabBarIcon: ({focused, color, size}) => {
           if (route.name === 'Home') {
-            return (iconName = focused ? (
-              <Ionicons name="home" size={size} color={color} />
+            return focused ? (
+              <Ionicons name="home-sharp" size={size} color={color} />
             ) : (
               <Ionicons name="home-outline" size={size} color={color} />
-            ));
+            );
           } else if (route.name === 'Search') {
-            return (iconName = focused ? (
+            return focused ? (
               <Ionicons name="search" size={size} color={color} />
             ) : (
               <Ionicons name="search-outline" size={size} color={color} />
-            ));
+            );
           } else if (route.name === 'Shop') {
-            return (iconName = focused ? (
+            return focused ? (
               <MaterialCommunityIcons
                 name="shopping"
                 size={size}
@@ -93,9 +93,9 @@ export default function BottomTabs({navigation, route}) {
                 size={size}
                 color={color}
               />
-            ));
+            );
           } else if (route.name === 'Reels') {
-            return (iconName = focused ? (
+            return focused ? (
               <MaterialCommunityIcons
                 name="play-box-multiple"
                 size={size}
@@ -107,9 +107,9 @@ export default function BottomTabs({navigation, route}) {
                 size={size}
                 color={color}
               />
-            ));
+            );
           } else if (route.name === 'Profile') {
-            return (iconName = focused ? (
+            return focused ? (
               <MaterialCommunityIcons
                 name="account-circle"
                 size={size}
@@ -121,7 +121,7 @@ export default function BottomTabs({navigation, route}) {
                 size={size}
                 color={color}
               />
-            ));
+            );
           }
         },
         tabBarActiveTintColor: colors.text,

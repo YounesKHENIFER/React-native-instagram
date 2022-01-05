@@ -1,10 +1,4 @@
-import React, {
-  useMemo,
-  useContext,
-  createContext,
-  useEffect,
-  useState,
-} from 'react';
+import React, {useContext, createContext, useEffect, useState} from 'react';
 
 import SplashScreen from '../components/SplashScreen';
 import firestore from '@react-native-firebase/firestore';

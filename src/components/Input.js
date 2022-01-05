@@ -1,5 +1,5 @@
 import React from 'react';
-import {TextInput, StyleSheet, View} from 'react-native';
+import {TextInput, StyleSheet} from 'react-native';
 import {useTheme} from '@react-navigation/native';
 
 const Input = ({

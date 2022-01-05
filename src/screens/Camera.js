@@ -80,7 +80,7 @@ export default function Camera({navigation}) {
               style={styles.btnBox}
               onPress={handleTakePicture}
               disabled={loading}>
-              <View style={styles.btn}></View>
+              <View style={styles.btn} />
             </TouchableOpacity>
           </View>
         </View>

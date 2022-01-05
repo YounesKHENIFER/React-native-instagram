@@ -41,7 +41,7 @@ export default function Auth() {
     if (email && password) {
       auth()
         .signInWithEmailAndPassword(email, password)
-        .then(() => setLoading(false))
+        .then(() => {})
         .catch(error => {
           setLoading(false);
 
@@ -78,7 +78,7 @@ export default function Auth() {
               profilePicture:
                 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png',
             })
-            .then(() => setLoading(false))
+            .then(() => {})
             .catch(() => {
               Errmsg('There Is A Probleme Try Again');
             });
@@ -176,8 +176,8 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   image: {
-    height: 150,
-    width: 150,
+    height: 70,
+    width: 70,
   },
   imageBox: {
     justifyContent: 'center',

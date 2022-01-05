@@ -97,36 +97,35 @@ function Chats() {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-
-  const onRefresh = () => {
-    setRefreshing(true);
-  };
 
   useEffect(
     () =>
       firestore()
         .collection('Messages')
-        .orderBy('lastChanged', 'desc')
         .where('Participants', 'array-contains', user.uid)
         .onSnapshot(
           res => {
             setMessages(
-              res.docs.map(message => ({id: message.id, ...message.data()})),
+              res.docs
+                .map(message => ({id: message.id, ...message.data()}))
+                .sort((a, b) => b.createdAt - a.createdAt),
             );
             setLoading(false);
             setRefreshing(false);
           },
           e => {
             setLoading(false);
+            console.log('msg', e.message);
+            setRefreshing(false);
           },
         ),
-    [refreshing],
+
+    [refreshing, user],
   );
 
   return (
     <>
-      <SearchBox onChangeText={setSearchTerm} />
+      <SearchBox />
       {loading ? (
         <View
           style={{
@@ -138,7 +137,7 @@ function Chats() {
       ) : (
         <FlatList
           refreshing={refreshing}
-          onRefresh={() => onRefresh()}
+          onRefresh={() => setRefreshing(true)}
           contentContainerStyle={[
             styles.container,
             {backgroundColor: colors.background},

@@ -1,13 +1,6 @@
-import React, {
-  useMemo,
-  useContext,
-  createContext,
-  useEffect,
-  useState,
-} from 'react';
+import React, {useContext, createContext, useEffect, useState} from 'react';
 
 import AsyncStorage from '@react-native-community/async-storage';
-import SplashScreen from '../components/SplashScreen';
 
 const ThemeContext = createContext();
 
