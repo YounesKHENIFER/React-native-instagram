@@ -124,7 +124,7 @@ function Chats() {
 
   return (
     <>
-      <SearchBox />
+      <SearchBox onChangeText={() => {}} />
       {loading ? (
         <View
           style={{
