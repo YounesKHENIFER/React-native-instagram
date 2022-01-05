@@ -37,8 +37,8 @@ export default function Auth() {
   // login function
 
   function handleLogin() {
-    setLoading(true);
     if (email && password) {
+      setLoading(true);
       auth()
         .signInWithEmailAndPassword(email, password)
         .then(() => {})
@@ -57,6 +57,7 @@ export default function Auth() {
           }
         });
     } else {
+      setLoading(false);
       Errmsg('Please Enter Your Credentials');
     }
   }
@@ -94,6 +95,7 @@ export default function Auth() {
           }
         });
     } else {
+      setLoading(false);
       Errmsg('Please Enter Your Credentials');
     }
   }

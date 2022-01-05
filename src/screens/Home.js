@@ -145,12 +145,11 @@ function Posts({navigation, colors, following, profilePicture}) {
         .collection('Posts')
         .limit(limit)
         .where('userId', 'in', following)
+        .orderBy('createdAt', 'desc')
         .onSnapshot(
           posts => {
             setPosts(
-              posts.docs
-                .map(post => ({postId: post.id, ...post.data()}))
-                .sort((a, b) => b.createdAt - a.createdAt),
+              posts.docs.map(post => ({postId: post.id, ...post.data()})),
             );
             setLoading(false);
             setRefreshing(false);

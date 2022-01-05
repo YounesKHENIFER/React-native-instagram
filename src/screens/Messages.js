@@ -103,12 +103,11 @@ function Chats() {
       firestore()
         .collection('Messages')
         .where('Participants', 'array-contains', user.uid)
+        .orderBy('lastChanged', 'desc')
         .onSnapshot(
           res => {
             setMessages(
-              res.docs
-                .map(message => ({id: message.id, ...message.data()}))
-                .sort((a, b) => b.createdAt - a.createdAt),
+              res.docs.map(message => ({id: message.id, ...message.data()})),
             );
             setLoading(false);
             setRefreshing(false);
@@ -246,9 +245,9 @@ function Calls() {
 }
 function Requests() {
   return (
-    <ScrollView style={styles.container}>
-      <Text>Requests</Text>
-    </ScrollView>
+    <View style={styles.container}>
+      <EmptyList item="Requests" />
+    </View>
   );
 }
 const styles = StyleSheet.create({
