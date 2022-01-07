@@ -10,6 +10,9 @@ your posts will be seen only by your followers .
 -- users can find you on Explore page with search functionality .
 
 -- you can message your friends with real time messages updates .
+##Download for Android :
+-- https://bit.ly/3tmu923
+
 
 Run `npm install` to install dependencies
 
