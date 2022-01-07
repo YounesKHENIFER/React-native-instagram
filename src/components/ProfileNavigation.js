@@ -7,6 +7,7 @@ import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs
 
 import Feather from 'react-native-vector-icons/Feather';
 import ThreePostsBox from '../components/ThreePostsBox';
+import EmptyList from './EmptyList';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -69,20 +70,16 @@ function Posts({posts, loading}) {
   );
 }
 function Videos() {
-  //  TODO : replace data with real vidoes
-  const data = [];
   return (
     <View style={styles.container}>
-      <ThreePostsBox data={data} forItem="Videos" />
+      <EmptyList item="Videos" />
     </View>
   );
 }
 function Tags() {
-  //  TODO : replace data with real tags
-  const data = [];
   return (
     <View style={styles.container}>
-      <ThreePostsBox data={data} forItem="Tags" />
+      <EmptyList item="Videos" />
     </View>
   );
 }

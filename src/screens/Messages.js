@@ -165,7 +165,7 @@ function Chats() {
 function Message({colors, senderID, roomId}) {
   const navigation = useNavigation();
   const [sender, setSender] = useState();
-  const [lastMessage, setLastMessage] = useState('');
+  const [lastMessage, setLastMessage] = useState({});
   // geeting sender infos
   function getSender() {
     firestore()
@@ -184,7 +184,11 @@ function Message({colors, senderID, roomId}) {
       .orderBy('createdAt', 'desc')
       .limit(1)
       .onSnapshot(
-        res => setLastMessage(res?.docs[0].data()),
+        res => {
+          if (res.docs.length) {
+            setLastMessage(res?.docs[0]?.data());
+          }
+        },
         e => console.log('getting sender :', e.message),
       );
   }
@@ -217,14 +221,14 @@ function Message({colors, senderID, roomId}) {
           <Text style={[styles.name, {color: colors.text}]}>
             {sender?.username}
           </Text>
-
           <Text numberOfLines={1} style={{color: 'gray', fontSize: 13}}>
             {lastMessage.message}
           </Text>
-
-          <Text numberOfLines={1} style={{color: 'gray', fontSize: 10}}>
-            {moment(lastMessage?.createdAt?.toDate()).fromNow()}
-          </Text>
+          {lastMessage.createdAt && (
+            <Text numberOfLines={1} style={{color: 'gray', fontSize: 10}}>
+              {moment(lastMessage?.createdAt?.toDate()).fromNow()}
+            </Text>
+          )}
         </View>
       </TouchableOpacity>
       {/* right section camera icon */}
